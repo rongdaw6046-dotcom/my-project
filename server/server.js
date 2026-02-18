@@ -307,6 +307,11 @@ app.get('/api/seed', async (req, res) => {
   } catch (e) { res.status(500).send('❌ Error: ' + e.message); }
 });
 
+// เพิ่มส่วนนี้เพื่อให้ Server รู้จักหน้าแรก (Root Path)
+app.get('/', (req, res) => {
+  res.send('Server is running properly!');
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
