@@ -314,11 +314,14 @@ app.get('/api/seed', async (req, res) => {
 });
 
 // Serve frontend (Vite build)
+// Serve frontend (Vite build)
 app.use(express.static(path.join(__dirname, '../dist')));
 
-app.use((req, res) => {
+// Catch-all เฉพาะ non-API routes
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
