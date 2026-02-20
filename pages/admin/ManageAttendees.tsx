@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, CheckCircle, XCircle, Clock, Trash, UserPlus, Share2, Users, Lock, Unlock, Printer } from 'lucide-react';
+import { ArrowLeft, Plus, Search, CheckCircle, XCircle, Clock, Trash, UserPlus, Share2, Users, Printer } from 'lucide-react';
 import { AdminMeetingTabs } from '../../components/AdminMeetingTabs';
 import { MeetingReport } from '../../components/MeetingReport';
 
@@ -15,22 +15,7 @@ export const ManageAttendees: React.FC = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
 
-    // LINE Config State (Load from LocalStorage)
-    const [lineConfig, setLineConfig] = useState({
-        channelId: localStorage.getItem('line_channel_id') || '2009159145',
-        channelSecret: localStorage.getItem('line_channel_secret') || '300deccd9d6dae47b7a639759268ff17',
-        targetGroupId: localStorage.getItem('line_target_group_id') || '',
-        liffId: localStorage.getItem('line_liff_id') || '2009162011-czxzSLew'
-    });
-    const [isLineLocked, setIsLineLocked] = useState(true);
 
-    // Save LINE Config to LocalStorage whenever it changes
-    useEffect(() => {
-        localStorage.setItem('line_channel_id', lineConfig.channelId);
-        localStorage.setItem('line_channel_secret', lineConfig.channelSecret);
-        localStorage.setItem('line_target_group_id', lineConfig.targetGroupId);
-        localStorage.setItem('line_liff_id', lineConfig.liffId);
-    }, [lineConfig]);
 
     // Invite Form State
     const [inviteType, setInviteType] = useState<'INTERNAL' | 'EXTERNAL'>('INTERNAL');
@@ -345,181 +330,7 @@ export const ManageAttendees: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* LINE Messaging API Panel */}
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <div className="p-4 border-b border-gray-200 bg-green-50/50 flex justify-between items-center">
-                                    <h3 className="font-bold text-gray-800 flex items-center gap-2 text-sm">
-                                        <Share2 size={16} className="text-green-600" /> LINE Messaging API
-                                    </h3>
-                                    <button
-                                        onClick={() => setIsLineLocked(!isLineLocked)}
-                                        className={`p-1 rounded-md transition-colors ${isLineLocked ? 'text-gray-400 hover:text-gray-600' : 'text-orange-500 bg-orange-50 hover:bg-orange-100'}`}
-                                        title={isLineLocked ? "ปลดล็อกเพื่อแก้ไข" : "ล็อกการแก้ไข"}
-                                    >
-                                        {isLineLocked ? <Lock size={16} /> : <Unlock size={16} />}
-                                    </button>
-                                </div>
-                                <div className="p-4 space-y-3">
-                                    <div className="p-3 bg-blue-50 border border-blue-100 rounded text-xs text-blue-800">
-                                        ระบบจะส่งข้อความแจ้งเตือนการประชุมเข้าสู่ **กลุ่มไลน์** เท่านั้น
-                                        <br />*หมายเหตุ: LIFF ID ต้องสร้างผ่านช่องทาง **LINE Login** (แทน Messaging API)*
-                                    </div>
-                                    <div className={`transition-opacity ${isLineLocked ? 'opacity-75' : ''}`}>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Channel ID</label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-3 py-1.5 border border-gray-300 rounded text-sm bg-gray-50"
-                                            value={lineConfig.channelId}
-                                            onChange={e => setLineConfig({ ...lineConfig, channelId: e.target.value })}
-                                            disabled={isLineLocked}
-                                        />
-                                    </div>
-                                    <div className={`transition-opacity ${isLineLocked ? 'opacity-75' : ''}`}>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Channel Secret</label>
-                                        <input
-                                            type="password"
-                                            className="w-full px-3 py-1.5 border border-gray-300 rounded text-sm bg-gray-50"
-                                            value={lineConfig.channelSecret}
-                                            onChange={e => setLineConfig({ ...lineConfig, channelSecret: e.target.value })}
-                                            disabled={isLineLocked}
-                                        />
-                                    </div>
 
-                                    <div className={`transition-opacity ${isLineLocked ? 'opacity-75' : ''}`}>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">LIFF ID (สำหรับหน้าลงทะเบียน)</label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-3 py-1.5 border border-gray-300 rounded text-sm bg-gray-50 font-mono"
-                                            placeholder="ระบุ LIFF ID..."
-                                            value={lineConfig.liffId}
-                                            onChange={e => setLineConfig({ ...lineConfig, liffId: e.target.value })}
-                                            disabled={isLineLocked}
-                                        />
-                                    </div>
-                                    <div className={`transition-opacity ${isLineLocked ? 'opacity-75' : ''}`}>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">Group ID (C.../G...)</label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-3 py-1.5 border border-gray-300 rounded text-sm font-mono bg-gray-50"
-                                            placeholder="ระบุ Group ID ที่นี่..."
-                                            value={lineConfig.targetGroupId}
-                                            onChange={e => setLineConfig({ ...lineConfig, targetGroupId: e.target.value })}
-                                            disabled={isLineLocked}
-                                        />
-                                    </div>
-                                    <p className="text-xs text-gray-500 italic">* ใช้ Access Token จาก .env ของ Server โดยตรง</p>
-                                    <button
-                                        onClick={async () => {
-                                            const { targetGroupId, liffId } = lineConfig;
-                                            if (!targetGroupId) { alert('กรุณาระบุ Group ID'); return; }
-                                            if (!liffId) { alert('กรุณาระบุ LIFF ID เพื่อสร้างปุ่มลงทะเบียน'); return; }
-
-                                            try {
-                                                alert('กำลังส่งข้อความผ่าน Server...');
-
-                                                // Simple URL: Root handles the redirect to #/liff/register
-                                                const liffRegisterUrl = `https://liff.line.me/${liffId}?meetingId=${meeting.id}&liffId=${liffId}`;
-
-                                                // Flex Message
-                                                const flexMessage = {
-                                                    type: "flex",
-                                                    altText: `เชิญประชุม: ${meeting.title}`,
-                                                    contents: {
-                                                        type: "bubble",
-                                                        header: {
-                                                            type: "box",
-                                                            layout: "vertical",
-                                                            contents: [
-                                                                { type: "text", text: "INVITATION", weight: "bold", color: "#E04F22", size: "xs" },
-                                                                { type: "text", text: meeting.title, weight: "bold", size: "xl", margin: "md", wrap: true }
-                                                            ]
-                                                        },
-                                                        body: {
-                                                            type: "box",
-                                                            layout: "vertical",
-                                                            contents: [
-                                                                {
-                                                                    type: "box",
-                                                                    layout: "vertical",
-                                                                    margin: "lg",
-                                                                    spacing: "sm",
-                                                                    contents: [
-                                                                        {
-                                                                            type: "box",
-                                                                            layout: "baseline",
-                                                                            spacing: "sm",
-                                                                            contents: [
-                                                                                { type: "text", text: "วันที่", color: "#aaaaaa", size: "sm", flex: 1 },
-                                                                                { type: "text", text: meeting.date, wrap: true, color: "#666666", size: "sm", flex: 5 }
-                                                                            ]
-                                                                        },
-                                                                        {
-                                                                            type: "box",
-                                                                            layout: "baseline",
-                                                                            spacing: "sm",
-                                                                            contents: [
-                                                                                { type: "text", text: "เวลา", color: "#aaaaaa", size: "sm", flex: 1 },
-                                                                                { type: "text", text: meeting.time, wrap: true, color: "#666666", size: "sm", flex: 5 }
-                                                                            ]
-                                                                        },
-                                                                        {
-                                                                            type: "box",
-                                                                            layout: "baseline",
-                                                                            spacing: "sm",
-                                                                            contents: [
-                                                                                { type: "text", text: "สถานที่", color: "#aaaaaa", size: "sm", flex: 1 },
-                                                                                { type: "text", text: meeting.location, wrap: true, color: "#666666", size: "sm", flex: 5 }
-                                                                            ]
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        },
-                                                        footer: {
-                                                            type: "box",
-                                                            layout: "vertical",
-                                                            spacing: "sm",
-                                                            contents: [
-                                                                {
-                                                                    type: "button",
-                                                                    style: "primary",
-                                                                    height: "sm",
-                                                                    action: {
-                                                                        type: "uri",
-                                                                        label: "ลงทะเบียนเข้าร่วม",
-                                                                        uri: liffRegisterUrl
-                                                                    },
-                                                                    color: "#E04F22"
-                                                                }
-                                                            ],
-                                                            flex: 0
-                                                        }
-                                                    }
-                                                };
-
-                                                const res = await fetch('/api/line/broadcast', {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({
-                                                        targetGroupId: targetGroupId,
-                                                        messages: [flexMessage]
-                                                    })
-                                                });
-
-                                                if (!res.ok) {
-                                                    const errorData = await res.json();
-                                                    throw new Error(errorData.error || 'Failed to send message');
-                                                }
-
-                                                alert('✅ ส่งข้อความสำเร็จ!');
-                                            } catch (e: any) { alert('Error: ' + e.message); }
-                                        }}
-                                        className="w-full bg-green-600 text-white text-sm font-medium py-2 rounded hover:bg-green-700 transition-colors flex items-center justify-center gap-1"
-                                    >
-                                        <Share2 size={14} /> ส่งข้อความ (Push via Server)
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@ import { ManageMeeting } from './pages/admin/ManageMeeting';
 import { ManageAgenda } from './pages/admin/ManageAgenda';
 import { ManageAttendees } from './pages/admin/ManageAttendees';
 import { PublicRSVP } from './pages/public/PublicRSVP';
-import { LIFFRegister } from './pages/public/LIFFRegister';
+
 import { UserDashboard } from './pages/user/UserDashboard';
 import { MeetingDetail } from './pages/user/MeetingDetail';
 import { UserRole } from './types';
@@ -40,7 +40,7 @@ const AppRoutes: React.FC = () => {
 
       {/* Public RSVP Route (No Login Required) */}
       <Route path="/rsvp/:id" element={<PublicRSVP />} />
-      <Route path="/liff/register" element={<LIFFRegister />} />
+
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={
