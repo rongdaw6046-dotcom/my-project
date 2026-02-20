@@ -179,7 +179,7 @@ export const LIFFRegister: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <p className="text-center text-xs text-gray-400 mt-8">Meeting Manager</p>
+            <p className="text-center text-xs text-gray-400 mt-8">ระบบบริหารจัดการการประชุมโรงพยาบาลศรีเทพ</p>
         </div>
     );
 };
