@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { useParams } from 'react-router-dom';
-import { Calendar, MapPin, Clock, CheckCircle, XCircle, Info, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, Clock, CheckCircle, XCircle, Info, ChevronRight, FileText, Eye, Download } from 'lucide-react';
 import { AttendeeStatus } from '../../types';
+import { FilePreviewModal } from '../../components/FilePreviewModal';
 
 export const PublicRSVP: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { meetings, attendees, updateAttendeeStatus, fetchAttendees, isLoading } = useApp();
+    const { meetings, attendees, updateAttendeeStatus, fetchAttendees, isLoading, documents, fetchDocuments } = useApp();
     const [selectedAttendeeId, setSelectedAttendeeId] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [status, setStatus] = useState<AttendeeStatus | null>(null);
+    const [previewFile, setPreviewFile] = useState<{ url: string; name: string; type?: string } | null>(null);
 
     const meeting = meetings.find(m => m.id === id);
 
     React.useEffect(() => {
         if (id) {
             fetchAttendees(id);
+            fetchDocuments(id);
         }
     }, [id]);
 
@@ -37,12 +40,17 @@ export const PublicRSVP: React.FC = () => {
     );
 
     const meetingAttendees = attendees.filter(a => a.meetingId === id);
+    const meetingDocuments = documents.filter(d => d.meetingId === id || d.meeting_id === id); // Ensure we filter for this meeting
 
     const handleSubmit = (selectedStatus: AttendeeStatus) => {
         if (!selectedAttendeeId) return;
         updateAttendeeStatus(selectedAttendeeId, selectedStatus);
         setStatus(selectedStatus);
         setSubmitted(true);
+    };
+
+    const handlePreview = (url: string, name: string) => {
+        setPreviewFile({ url, name });
     };
 
     if (submitted) {
@@ -110,6 +118,53 @@ export const PublicRSVP: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Documents Section */}
+                    {meetingDocuments.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <FileText size={16} className="text-orange-600" /> เอกสารเชิญประชุม
+                            </h3>
+                            <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                                {meetingDocuments.map(doc => {
+                                    const downloadUrl = doc.url || `/api/documents/${doc.id}/download`;
+                                    const canPreview = !doc.url || doc.name.match(/\.(pdf|jpg|jpeg|png)$/i);
+
+                                    return (
+                                        <div key={doc.id} className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-md">
+                                            <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+                                                <div className="bg-red-100 p-1.5 rounded text-red-600 flex-shrink-0">
+                                                    <FileText size={16} />
+                                                </div>
+                                                <span className="text-sm text-gray-700 truncate">{doc.name}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                                {canPreview ? (
+                                                    <button
+                                                        onClick={() => handlePreview(downloadUrl, doc.name)}
+                                                        className="text-orange-600 hover:text-orange-700 p-1.5 rounded hover:bg-orange-50"
+                                                        title="ดูตัวอย่าง"
+                                                    >
+                                                        <Eye size={18} />
+                                                    </button>
+                                                ) : (
+                                                    <a
+                                                        href={downloadUrl}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="text-gray-500 hover:text-green-600 p-1.5 rounded hover:bg-green-50"
+                                                        title="ดาวน์โหลด"
+                                                    >
+                                                        <Download size={18} />
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="border-t border-gray-100 my-6"></div>
 
                     {/* Form */}
@@ -156,6 +211,14 @@ export const PublicRSVP: React.FC = () => {
                 </div>
             </div>
             <p className="fixed bottom-4 text-xs text-gray-400">©Meeting System</p>
+
+            <FilePreviewModal
+                isOpen={!!previewFile}
+                onClose={() => setPreviewFile(null)}
+                fileUrl={previewFile?.url || ''}
+                fileName={previewFile?.name || ''}
+                fileType={previewFile?.type}
+            />
         </div>
     );
 };
