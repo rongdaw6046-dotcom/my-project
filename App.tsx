@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: UserR
     return <Navigate to={user.role === UserRole.ADMIN ? '/admin/dashboard' : '/user/dashboard'} replace />;
   }
 
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 };
 
 const AppRoutes: React.FC = () => {
