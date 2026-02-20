@@ -20,7 +20,7 @@ export const ManageAttendees: React.FC = () => {
         channelId: localStorage.getItem('line_channel_id') || '2009159145',
         channelSecret: localStorage.getItem('line_channel_secret') || '300deccd9d6dae47b7a639759268ff17',
         targetGroupId: localStorage.getItem('line_target_group_id') || '',
-        liffId: localStorage.getItem('line_liff_id') || '2009162011-O1Z3UDRu'
+        liffId: localStorage.getItem('line_liff_id') || '2009162011-czxzSLew'
     });
     const [isLineLocked, setIsLineLocked] = useState(true);
 

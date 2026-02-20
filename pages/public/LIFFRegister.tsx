@@ -12,7 +12,7 @@ export const LIFFRegister: React.FC = () => {
     };
 
     const meetingId = getParam('meetingId');
-    const liffId = getParam('liffId') || '2009162011-O1Z3UDRu'; // Fallback to provided ID
+    const liffId = getParam('liffId') || '2009162011-czxzSLew'; // Fallback to provided ID
 
     const [profile, setProfile] = useState<any>(null);
     const [name, setName] = useState('');
