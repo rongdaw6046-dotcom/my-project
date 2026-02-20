@@ -6,7 +6,7 @@ import { AttendeeStatus } from '../../types';
 
 export const PublicRSVP: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { meetings, attendees, updateAttendeeStatus, fetchAttendees } = useApp();
+    const { meetings, attendees, updateAttendeeStatus, fetchAttendees, isLoading } = useApp();
     const [selectedAttendeeId, setSelectedAttendeeId] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [status, setStatus] = useState<AttendeeStatus | null>(null);
@@ -18,6 +18,14 @@ export const PublicRSVP: React.FC = () => {
             fetchAttendees(id);
         }
     }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-orange-600 animate-pulse">กำลังโหลดข้อมูล...</div>
+            </div>
+        );
+    }
 
     if (!meeting) return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
