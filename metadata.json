@@ -1,5 +1,5 @@
 {
-  "name": "KKU Meeting Manager",
-  "description": "A comprehensive meeting management system for managing agendas, attendees, and minutes, inspired by KKU meeting standards.",
+  "name": "ระบบบริหารจัดการการประชุมโรงพยาบาลศรีเทพ",
+  "description": "ระบบสำหรับบริหารจัดการเและติดตามการประชุม โรงพยาบาลศรีเทพ",
   "requestFramePermissions": []
 }
