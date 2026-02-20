@@ -50,7 +50,17 @@ export const LIFFRegister: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!meetingId || !profile) return;
+        if (!meetingId) {
+            alert("ไม่พบรหัสการประชุม (Missing Meeting ID)");
+            return;
+        }
+        if (!profile) {
+            alert("ไม่พบข้อมูลผู้ใช้ LINE (Missing Profile)");
+            return;
+        }
+
+        // Show loading state while submitting
+        // setStatus('LOADING'); // Optional: can just disable button
 
         try {
             const response = await fetch('/api/attendees/liff', {
@@ -65,7 +75,11 @@ export const LIFFRegister: React.FC = () => {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to register');
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to register');
+            }
 
             setStatus('SUCCESS');
             // Close window after 3 seconds
@@ -74,18 +88,40 @@ export const LIFFRegister: React.FC = () => {
             }, 3000);
 
         } catch (err: any) {
-            setError(err.message);
+            console.error('Submit Error:', err);
+            alert(`เกิดข้อผิดพลาด: ${err.message}`);
+            // Do not set status to ERROR, stay on form to retry
         }
     };
 
-    if (status === 'LOADING') return <div className="p-10 text-center">Loading LINE...</div>;
-    if (status === 'ERROR') return <div className="p-10 text-center text-red-500"><AlertCircle className="mx-auto mb-2" />{error}</div>;
+    if (status === 'LOADING') return (
+        <div className="flex flex-col items-center justify-center min-h-screen p-10 text-center bg-gray-50">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-600 mb-4"></div>
+            <p>กำลังโหลดข้อมูล LINE...</p>
+        </div>
+    );
+
+    if (status === 'ERROR') return (
+        <div className="flex flex-col items-center justify-center min-h-screen p-10 text-center bg-red-50 text-red-600">
+            <AlertCircle size={48} className="mb-4" />
+            <h2 className="text-xl font-bold mb-2">เกิดข้อผิดพลาด</h2>
+            <p className="bg-white p-4 rounded border border-red-200 text-sm font-mono break-all">{error}</p>
+            <div className="mt-6 text-xs text-gray-500 text-left w-full max-w-md">
+                <p><strong>Debug Info:</strong></p>
+                <p>LIFF ID: {liffId}</p>
+                <p>Meeting ID: {meetingId || 'null'}</p>
+            </div>
+            <button onClick={() => window.location.reload()} className="mt-8 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">ลองใหม่อีกครั้ง</button>
+        </div>
+    );
+
     if (status === 'SUCCESS') return (
-        <div className="p-10 text-center flex flex-col items-center justify-center h-screen bg-green-50">
+        <div className="flex flex-col items-center justify-center min-h-screen p-10 text-center bg-green-50">
             <CheckCircle size={64} className="text-green-500 mb-4" />
             <h2 className="text-2xl font-bold text-green-700">ลงทะเบียนสำเร็จ!</h2>
             <p className="text-gray-600 mt-2">ขอบคุณที่เข้าร่วมการประชุม</p>
             <p className="text-xs text-gray-400 mt-8">หน้าต่างจะปิดอัตโนมัติ...</p>
+            <button onClick={() => liff.closeWindow()} className="mt-4 px-4 py-2 border border-green-600 text-green-600 rounded hover:bg-green-50">ปิดหน้าต่าง</button>
         </div>
     );
 
@@ -137,6 +173,10 @@ export const LIFFRegister: React.FC = () => {
                             ยืนยันการเข้าร่วม
                         </button>
                     </form>
+
+                    <div className="mt-4 text-[10px] text-gray-300 text-center font-mono">
+                        Meeting: {meetingId} | LIFF: {liffId}
+                    </div>
                 </div>
             </div>
             <p className="text-center text-xs text-gray-400 mt-8">KKU Meeting Manager</p>
