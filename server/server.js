@@ -297,6 +297,41 @@ app.post('/api/attendees/liff', async (req, res) => {
   }
 });
 
+app.post('/api/line/broadcast', async (req, res) => {
+  try {
+    const { messages, targetGroupId } = req.body;
+    // อ่าน Token จาก .env ที่ใส่ไว้
+    const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+
+    if (!channelAccessToken) {
+      return res.status(500).json({ error: 'Server missing LINE_CHANNEL_ACCESS_TOKEN' });
+    }
+
+    const response = await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${channelAccessToken}`
+      },
+      body: JSON.stringify({
+        to: targetGroupId,
+        messages: messages
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('LINE API Error:', errorData);
+      throw new Error(errorData.message || 'Failed to send LINE message');
+    }
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('LINE Broadcast Error:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── Seed ─────────────────────────────────────────────────────────────────────
 app.get('/api/seed', async (req, res) => {
   try {

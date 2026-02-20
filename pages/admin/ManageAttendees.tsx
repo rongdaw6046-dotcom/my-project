@@ -384,6 +384,7 @@ export const ManageAttendees: React.FC = () => {
                                             disabled={isLineLocked}
                                         />
                                     </div>
+
                                     <div className={`transition-opacity ${isLineLocked ? 'opacity-75' : ''}`}>
                                         <label className="block text-xs font-medium text-gray-700 mb-1">LIFF ID (สำหรับหน้าลงทะเบียน)</label>
                                         <input
@@ -406,27 +407,15 @@ export const ManageAttendees: React.FC = () => {
                                             disabled={isLineLocked}
                                         />
                                     </div>
+                                    <p className="text-xs text-gray-500 italic">* ใช้ Access Token จาก .env ของ Server โดยตรง</p>
                                     <button
                                         onClick={async () => {
-                                            const { channelId, channelSecret, targetGroupId, liffId } = lineConfig;
-                                            if (!channelId || !channelSecret || !targetGroupId) { alert('กรุณาระบุข้อมูลให้ครบ (Channel ID, Secret, Group ID)'); return; }
+                                            const { targetGroupId, liffId } = lineConfig;
+                                            if (!targetGroupId) { alert('กรุณาระบุ Group ID'); return; }
                                             if (!liffId) { alert('กรุณาระบุ LIFF ID เพื่อสร้างปุ่มลงทะเบียน'); return; }
 
                                             try {
-                                                const tokenParams = new URLSearchParams();
-                                                tokenParams.append('grant_type', 'client_credentials');
-                                                tokenParams.append('client_id', channelId);
-                                                tokenParams.append('client_secret', channelSecret);
-
-                                                alert('กำลังเชื่อมต่อ LINE...');
-
-                                                const tokenRes = await fetch('/api/line-bot/v2/oauth/accessToken', {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                                    body: tokenParams
-                                                });
-                                                if (!tokenRes.ok) throw new Error('Failed to get Access Token');
-                                                const { access_token } = await tokenRes.json();
+                                                alert('กำลังส่งข้อความผ่าน Server...');
 
                                                 // Simple URL: Root handles the redirect to #/liff/register
                                                 const liffRegisterUrl = `https://liff.line.me/${liffId}?meetingId=${meeting.id}&liffId=${liffId}`;
@@ -508,24 +497,26 @@ export const ManageAttendees: React.FC = () => {
                                                     }
                                                 };
 
-                                                const message = {
-                                                    to: targetGroupId,
-                                                    messages: [flexMessage]
-                                                };
-
-                                                const pushRes = await fetch('/api/line-bot/v2/bot/message/push', {
+                                                const res = await fetch('/api/line/broadcast', {
                                                     method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${access_token}` },
-                                                    body: JSON.stringify(message)
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({
+                                                        targetGroupId: targetGroupId,
+                                                        messages: [flexMessage]
+                                                    })
                                                 });
-                                                if (!pushRes.ok) throw new Error('Failed to send Push Message');
+
+                                                if (!res.ok) {
+                                                    const errorData = await res.json();
+                                                    throw new Error(errorData.error || 'Failed to send message');
+                                                }
 
                                                 alert('✅ ส่งข้อความสำเร็จ!');
                                             } catch (e: any) { alert('Error: ' + e.message); }
                                         }}
                                         className="w-full bg-green-600 text-white text-sm font-medium py-2 rounded hover:bg-green-700 transition-colors flex items-center justify-center gap-1"
                                     >
-                                        <Share2 size={14} /> ส่งข้อความ (Push)
+                                        <Share2 size={14} /> ส่งข้อความ (Push via Server)
                                     </button>
                                 </div>
                             </div>
