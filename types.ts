@@ -56,6 +56,7 @@ export interface MeetingDocument {
   meetingId: string;
   name: string;
   url: string;
+  mimeType?: string; // Optional: for uploaded files
   createdAt: string;
 }
 

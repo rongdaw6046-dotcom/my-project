@@ -261,40 +261,74 @@ app.patch('/api/attendees/:id/status', async (req, res) => {
 });
 
 // ─── Documents ────────────────────────────────────────────────────────────────
+// ─── Documents ────────────────────────────────────────────────────────────────
 app.get('/api/documents', async (req, res) => {
   try {
     const meetingId = req.query.meetingId;
+    // EXCLUDE file_data to prevent large payloads
     const query = meetingId
-      ? 'SELECT * FROM documents WHERE meeting_id = $1 ORDER BY created_at DESC'
-      : 'SELECT * FROM documents ORDER BY created_at DESC';
+      ? 'SELECT id, meeting_id, name, url, mime_type, created_at FROM documents WHERE meeting_id = $1 ORDER BY created_at DESC'
+      : 'SELECT id, meeting_id, name, url, mime_type, created_at FROM documents ORDER BY created_at DESC';
     const params = meetingId ? [meetingId] : [];
     const { rows } = await pool.query(query, params);
+
     res.json(rows.map(row => ({
       id: row.id,
       meetingId: row.meeting_id,
       name: row.name,
-      url: row.url,
+      url: row.url, // Might be null for uploaded files
+      mimeType: row.mime_type,
       createdAt: row.created_at
     })));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.get('/api/documents/:id/download', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT name, file_data, mime_type FROM documents WHERE id = $1', [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Document not found' });
+
+    const doc = rows[0];
+    if (!doc.file_data) {
+      return res.status(404).json({ error: 'No file content found for this document' });
+    }
+
+    // Convert Base64 back to buffer
+    const fileBuffer = Buffer.from(doc.file_data, 'base64');
+
+    res.setHeader('Content-Type', doc.mime_type || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(doc.name)}"`);
+    res.send(fileBuffer);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/documents', async (req, res) => {
   try {
-    const { meetingId, name, url } = req.body;
+    const { meetingId, name, url, fileData, mimeType } = req.body;
+
+    // If fileData is provided, we store it. url can be ignored or used as fallback.
     const { rows: newDoc } = await pool.query(
-      'INSERT INTO documents (meeting_id, name, url) VALUES ($1, $2, $3) RETURNING *',
-      [meetingId, name, url]
+      'INSERT INTO documents (meeting_id, name, url, file_data, mime_type) VALUES ($1, $2, $3, $4, $5) RETURNING id, meeting_id, name, url, mime_type, created_at',
+      [meetingId, name, url || '', fileData || null, mimeType || null]
     );
+
     const row = newDoc[0];
     res.json({
       id: row.id,
       meetingId: row.meeting_id,
       name: row.name,
       url: row.url,
+      mimeType: row.mime_type,
       createdAt: row.created_at
     });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    // PostgreSQL might return error if payload is too large, handle it
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.delete('/api/documents/:id', async (req, res) => {

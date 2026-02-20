@@ -236,6 +236,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addDocument = async (doc: any) => {
+    // doc can contain { meetingId, name, url, fileData, mimeType }
     await fetch(`${API}/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
