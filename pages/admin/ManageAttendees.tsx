@@ -110,6 +110,7 @@ export const ManageAttendees: React.FC = () => {
         }
     };
 
+    const rsvpLink = `${window.location.origin}/#/rsvp/${meeting.id}`;
     const copyLink = () => {
         navigator.clipboard.writeText(rsvpLink);
         alert('คัดลอกลิงก์สำหรับส่งไฟล์แล้ว: ' + rsvpLink);
