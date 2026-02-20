@@ -35,6 +35,7 @@ export interface Meeting {
   status: 'UPCOMING' | 'COMPLETED';
   budget?: number; // 7. สถิติค่าใช้จ่าย
   minutesFiles?: { name: string; url: string }[]; // 6. รายงานการประชุม
+  minutesSummary?: string; // New: สรุปรายงานการประชุม
 }
 
 // 3. & 4. & 5. จัดการผู้เข้าร่วมและสถานะ
@@ -49,20 +50,42 @@ export interface Attendee {
   status: AttendeeStatus;
 }
 
+// 5. เอกสารการประชุม
+export interface MeetingDocument {
+  id: string;
+  meetingId: string;
+  name: string;
+  url: string;
+  createdAt: string;
+}
+
+// 7. แจ้งเตือน
+export interface Notification {
+  id: string;
+  userId?: string;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export interface MeetingContextType {
   user: User | null;
   users: User[];
   meetings: Meeting[];
   agendas: AgendaItem[];
   attendees: Attendee[];
-  isLoading: boolean; // New: For database loading state
+  documents: MeetingDocument[]; // New
+  notifications: Notification[]; // New
+  isLoading: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (user: Omit<User, 'id' | 'allowedMeetingIds'>) => Promise<boolean>;
   // Admin Actions
   addUser: (user: Omit<User, 'id' | 'allowedMeetingIds'>) => void;
-  updateUser: (id: string, user: Partial<User>) => void; // New
-  deleteUser: (id: string) => void; // New
+  updateUser: (id: string, user: Partial<User>) => void;
+  deleteUser: (id: string) => void;
   updateUserPermissions: (userId: string, meetingIds: string[]) => void;
   addMeeting: (meeting: Omit<Meeting, 'id'>) => void;
   updateMeeting: (id: string, meeting: Partial<Meeting>) => void;
@@ -75,4 +98,11 @@ export interface MeetingContextType {
   removeAttendee: (id: string) => void;
   updateAttendeeStatus: (id: string, status: AttendeeStatus) => void;
   fetchAttendees: (meetingId: string) => void;
+  // Document Actions
+  fetchDocuments: (meetingId: string) => void;
+  addDocument: (doc: Omit<MeetingDocument, 'id' | 'createdAt'>) => void;
+  deleteDocument: (id: string) => void;
+  // Notification Actions
+  fetchNotifications: () => void;
+  sendNotification: (notif: Omit<Notification, 'id' | 'isRead' | 'createdAt'>) => void;
 }

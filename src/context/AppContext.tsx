@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
-  User, Meeting, AgendaItem, Attendee,
+  User, Meeting, AgendaItem, Attendee, MeetingDocument, Notification,
   MeetingContextType, UserRole, AttendeeStatus
 } from '../../types';
 
@@ -226,6 +226,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fetchData();
   };
 
+  // --- 7. Documents ---
+  const [documents, setDocuments] = useState<any[]>([]);
+  const fetchDocuments = async (meetingId: string) => {
+    try {
+      const data = await fetch(`${API}/documents?meetingId=${meetingId}`).then(r => r.json());
+      if (Array.isArray(data)) setDocuments(data);
+    } catch (e) { console.error('Error fetching documents:', e); }
+  };
+
+  const addDocument = async (doc: any) => {
+    await fetch(`${API}/documents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(doc)
+    });
+    fetchDocuments(doc.meetingId);
+  };
+
+  const deleteDocument = async (id: string) => {
+    const target = documents.find(d => d.id === id);
+    await fetch(`${API}/documents/${id}`, { method: 'DELETE' });
+    if (target) fetchDocuments(target.meetingId);
+  };
+
+  // --- 8. Notifications ---
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const fetchNotifications = async () => {
+    try {
+      const userId = user?.id; // Assuming user is available in scope or passed
+      const url = userId ? `${API}/notifications?userId=${userId}` : `${API}/notifications`;
+      const data = await fetch(url).then(r => r.json());
+      if (Array.isArray(data)) setNotifications(data);
+    } catch (e) { console.error('Error fetching notifications:', e); }
+  };
+
+  const sendNotification = async (notif: any) => {
+    await fetch(`${API}/notifications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(notif)
+    });
+    fetchNotifications();
+  };
+
   return (
     <AppContext.Provider value={{
       user, users, meetings, agendas, attendees, isLoading,
@@ -234,7 +278,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addMeeting, updateMeeting, deleteMeeting,
       addAgenda, updateAgenda, deleteAgenda,
       addAttendee, removeAttendee, updateAttendeeStatus,
-      fetchAttendees
+      fetchAttendees,
+      documents, notifications,
+      fetchDocuments, addDocument, deleteDocument,
+      fetchNotifications, sendNotification
     }}>
       {children}
     </AppContext.Provider>

@@ -38,7 +38,8 @@ const formatMeeting = (row) => ({
   location: row.location || '',
   status: row.status || 'UPCOMING',
   budget: row.budget ? parseFloat(row.budget) : 0,
-  minutesFiles: row["minutesFiles"] || []
+  minutesFiles: row["minutesFiles"] || [],
+  minutesSummary: row.minutes_summary || ''
 });
 
 const formatAgenda = (row) => ({
@@ -154,10 +155,10 @@ app.get('/api/meetings', async (req, res) => {
 
 app.post('/api/meetings', async (req, res) => {
   try {
-    const { title, edition, date, time, location, status, budget, minutesFiles } = req.body;
+    const { title, edition, date, time, location, status, budget, minutesFiles, minutesSummary } = req.body;
     const { rows: newMeeting } = await pool.query(
-      'INSERT INTO meetings (title, edition, date, time, location, status, budget, "minutesFiles") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [title, edition, date, time, location, status, budget, JSON.stringify(minutesFiles || [])]
+      'INSERT INTO meetings (title, edition, date, time, location, status, budget, "minutesFiles", minutes_summary) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+      [title, edition, date, time, location, status, budget, JSON.stringify(minutesFiles || []), minutesSummary || '']
     );
     res.json(formatMeeting(newMeeting[0]));
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -165,10 +166,10 @@ app.post('/api/meetings', async (req, res) => {
 
 app.put('/api/meetings/:id', async (req, res) => {
   try {
-    const { title, edition, date, time, location, status, budget, minutesFiles } = req.body;
+    const { title, edition, date, time, location, status, budget, minutesFiles, minutesSummary } = req.body;
     const { rows: updated } = await pool.query(
-      'UPDATE meetings SET title=$1, edition=$2, date=$3, time=$4, location=$5, status=$6, budget=$7, "minutesFiles"=$8 WHERE id=$9 RETURNING *',
-      [title, edition, date, time, location, status, budget, JSON.stringify(minutesFiles || []), req.params.id]
+      'UPDATE meetings SET title=$1, edition=$2, date=$3, time=$4, location=$5, status=$6, budget=$7, "minutesFiles"=$8, minutes_summary=$9 WHERE id=$10 RETURNING *',
+      [title, edition, date, time, location, status, budget, JSON.stringify(minutesFiles || []), minutesSummary || '', req.params.id]
     );
     res.json(formatMeeting(updated[0]));
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -256,6 +257,94 @@ app.patch('/api/attendees/:id/status', async (req, res) => {
       [req.body.status, req.params.id]
     );
     res.json(formatAttendee(updated[0]));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Documents ────────────────────────────────────────────────────────────────
+app.get('/api/documents', async (req, res) => {
+  try {
+    const meetingId = req.query.meetingId;
+    const query = meetingId
+      ? 'SELECT * FROM documents WHERE meeting_id = $1 ORDER BY created_at DESC'
+      : 'SELECT * FROM documents ORDER BY created_at DESC';
+    const params = meetingId ? [meetingId] : [];
+    const { rows } = await pool.query(query, params);
+    res.json(rows.map(row => ({
+      id: row.id,
+      meetingId: row.meeting_id,
+      name: row.name,
+      url: row.url,
+      createdAt: row.created_at
+    })));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/documents', async (req, res) => {
+  try {
+    const { meetingId, name, url } = req.body;
+    const { rows: newDoc } = await pool.query(
+      'INSERT INTO documents (meeting_id, name, url) VALUES ($1, $2, $3) RETURNING *',
+      [meetingId, name, url]
+    );
+    const row = newDoc[0];
+    res.json({
+      id: row.id,
+      meetingId: row.meeting_id,
+      name: row.name,
+      url: row.url,
+      createdAt: row.created_at
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/documents/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM documents WHERE id = $1', [req.params.id]);
+    res.status(204).send();
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    // Get broadcast notifications (user_id IS NULL) OR specific user notifications
+    const query = `
+      SELECT * FROM notifications 
+      WHERE user_id IS NULL ${userId ? 'OR user_id = $1' : ''}
+      ORDER BY created_at DESC
+    `;
+    const params = userId ? [userId] : [];
+    const { rows } = await pool.query(query, params);
+    res.json(rows.map(row => ({
+      id: row.id,
+      userId: row.user_id,
+      title: row.title,
+      message: row.message,
+      type: row.type,
+      isRead: row.is_read,
+      createdAt: row.created_at
+    })));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/notifications', async (req, res) => {
+  try {
+    const { userId, title, message, type } = req.body;
+    const { rows: newNotif } = await pool.query(
+      'INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, $4) RETURNING *',
+      [userId || null, title, message, type || 'SYSTEM']
+    );
+    const row = newNotif[0];
+    res.json({
+      id: row.id,
+      userId: row.user_id,
+      title: row.title,
+      message: row.message,
+      type: row.type,
+      isRead: row.is_read,
+      createdAt: row.created_at
+    });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

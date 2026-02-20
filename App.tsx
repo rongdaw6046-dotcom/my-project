@@ -1,19 +1,23 @@
+
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './src/context/AppContext';
 import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
-import { Register } from './pages/Register'; // New
+import { Register } from './pages/Register';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { ManageUsers } from './pages/admin/ManageUsers';
 import { ManageMeetings } from './pages/admin/ManageMeetings';
 import { ManageMeeting } from './pages/admin/ManageMeeting';
 import { ManageAgenda } from './pages/admin/ManageAgenda';
 import { ManageAttendees } from './pages/admin/ManageAttendees';
-import { PublicRSVP } from './pages/public/PublicRSVP';
-
+import { ManageDocuments } from './pages/admin/ManageDocuments';
+import { ManageMinutes } from './pages/admin/ManageMinutes';
+import { ManageNotifications } from './pages/admin/ManageNotifications';
+import { Reports } from './pages/admin/Reports';
 import { UserDashboard } from './pages/user/UserDashboard';
 import { MeetingDetail } from './pages/user/MeetingDetail';
+import { PublicRSVP } from './pages/public/PublicRSVP';
 import { UserRole } from './types';
 
 // Protected Route Component
@@ -48,14 +52,14 @@ const AppRoutes: React.FC = () => {
           <AdminDashboard />
         </ProtectedRoute>
       } />
-      <Route path="/admin/meetings" element={
-        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
-          <ManageMeetings />
-        </ProtectedRoute>
-      } />
       <Route path="/admin/users" element={
         <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
           <ManageUsers />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/meetings" element={
+        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ManageMeetings />
         </ProtectedRoute>
       } />
       <Route path="/admin/meetings/new" element={
@@ -76,6 +80,26 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin/meetings/:id/attendees" element={
         <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
           <ManageAttendees />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/meetings/:id/documents" element={
+        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ManageDocuments />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/meetings/:id/minutes" element={
+        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ManageMinutes />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/notifications" element={
+        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ManageNotifications />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/reports" element={
+        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <Reports />
         </ProtectedRoute>
       } />
 

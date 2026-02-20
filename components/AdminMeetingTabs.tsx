@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Users, Info, Settings, ChevronRight } from 'lucide-react';
+import { Info, Users, List, FileText, CheckSquare, ChevronRight, BarChart2, Bell } from 'lucide-react';
 
 interface AdminMeetingTabsProps {
   meetingId: string;
@@ -11,12 +12,14 @@ export const AdminMeetingTabs: React.FC<AdminMeetingTabsProps> = ({ meetingId })
 
   const tabs = [
     { path: `/admin/meetings/edit/${meetingId}`, label: 'ข้อมูลทั่วไป', icon: Info },
-    { path: `/admin/meetings/${meetingId}/agenda`, label: 'วาระการประชุม', icon: FileText },
+    { path: `/admin/meetings/${meetingId}/agenda`, label: 'วาระการประชุม', icon: List },
     { path: `/admin/meetings/${meetingId}/attendees`, label: 'ผู้เข้าร่วม', icon: Users },
+    { path: `/admin/meetings/${meetingId}/documents`, label: 'เอกสาร', icon: FileText },
+    { path: `/admin/meetings/${meetingId}/minutes`, label: 'สรุปการประชุม', icon: CheckSquare },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
       <div className="p-4 bg-gray-50 border-b border-gray-100">
         <h3 className="font-semibold text-gray-700 text-sm uppercase tracking-wider">เมนูจัดการ</h3>
       </div>
@@ -29,14 +32,14 @@ export const AdminMeetingTabs: React.FC<AdminMeetingTabsProps> = ({ meetingId })
               key={tab.path}
               to={tab.path}
               className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all
-                ${isActive 
-                  ? 'bg-orange-50 text-orange-700' 
+                  ${isActive
+                  ? 'bg-orange-50 text-orange-700'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
               <div className="flex items-center gap-3">
                 <Icon size={18} className={isActive ? 'text-orange-600' : 'text-gray-400'} />
-                {tab.label}
+                <span>{tab.label}</span>
               </div>
               {isActive && <ChevronRight size={16} className="text-orange-400" />}
             </Link>
