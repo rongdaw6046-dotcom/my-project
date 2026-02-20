@@ -48,7 +48,15 @@ export const MeetingReport: React.FC<MeetingReportProps> = ({ meeting, attendees
                     {acceptedAttendees.map((attendee, index) => (
                         <tr key={attendee.id}>
                             <td className="border border-gray-300 px-4 py-3 text-center">{index + 1}</td>
-                            <td className="border border-gray-300 px-4 py-3">{attendee.name}</td>
+                            <td className="border border-gray-300 px-4 py-3">
+                                {(() => {
+                                    if (attendee.userId) {
+                                        const u = users.find(user => user.id === attendee.userId);
+                                        return u ? `${u.name} ${u.surname}` : attendee.name;
+                                    }
+                                    return attendee.name;
+                                })()}
+                            </td>
                             <td className="border border-gray-300 px-4 py-3">{attendee.position}</td>
                             <td className="border border-gray-300 px-4 py-3"></td>
                             <td className="border border-gray-300 px-4 py-3"></td>
