@@ -19,7 +19,8 @@ const StatCard: React.FC<{ title: string; value: string; subtitle?: string; icon
 );
 
 export const AdminDashboard: React.FC = () => {
-    const { meetings, attendees } = useApp();
+    const { meetings, attendees, users } = useApp();
+    const navigate = useNavigate();
 
     // 1. Meeting Stats
     const totalMeetings = meetings.length;

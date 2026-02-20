@@ -21,8 +21,13 @@ import { PublicRSVP } from './pages/public/PublicRSVP';
 import { UserRole } from './types';
 
 // Protected Route Component
+// Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: UserRole[] }> = ({ children, allowedRoles }) => {
-  const { user } = useApp();
+  const { user, isLoading } = useApp();
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center text-orange-600">Loading...</div>;
+  }
 
   if (!user) {
     return <Navigate to="/" replace />;
@@ -33,7 +38,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: UserR
     return <Navigate to={user.role === UserRole.ADMIN ? '/admin/dashboard' : '/user/dashboard'} replace />;
   }
 
-  return <Layout>{children}</Layout>;
+  return <>{children}</>;
 };
 
 const AppRoutes: React.FC = () => {

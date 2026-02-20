@@ -24,9 +24,9 @@ export const Login: React.FC = () => {
     }
 
     // 2. Normal auth redirect
-    if (user) {
-      if (user.role === UserRole.ADMIN) navigate('/admin/dashboard');
-      else navigate('/user/dashboard');
+    if (user && user.role) {
+      if (user.role === UserRole.ADMIN) navigate('/admin/dashboard', { replace: true });
+      else navigate('/user/dashboard', { replace: true });
     }
   }, [user, navigate]);
 
