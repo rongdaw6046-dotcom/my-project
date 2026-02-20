@@ -110,10 +110,35 @@ export const ManageAttendees: React.FC = () => {
         }
     };
 
-    const rsvpLink = `${window.location.origin}/#/rsvp/${meeting.id}`;
     const copyLink = () => {
         navigator.clipboard.writeText(rsvpLink);
-        alert('คัดลอกลิงก์สำหรับส่งไลน์แล้ว: ' + rsvpLink);
+        alert('คัดลอกลิงก์สำหรับส่งไฟล์แล้ว: ' + rsvpLink);
+    };
+
+    const sendBotInvite = async (attendee: any, userWithLine: any) => {
+        if (!userWithLine.lineUserId) return alert('ผู้ใช้ท่านนี้ยังไม่ได้เชื่อมต่อ LINE');
+
+        try {
+            const res = await fetch('/api/line/send-invite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lineUserId: userWithLine.lineUserId,
+                    meeting: {
+                        title: meeting.title,
+                        date: meeting.date,
+                        time: meeting.time,
+                        location: meeting.location
+                    },
+                    rsvpLink
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to send');
+            alert('ส่งบัตรเชิญผ่าน LINE Bot สำเร็จ!');
+        } catch (err: any) {
+            alert('ส่งไม่สำเร็จ: ' + err.message + '\n(ตรวจสอบ Channel Access Token ใน Server)');
+        }
     };
 
     return (
@@ -185,7 +210,7 @@ export const ManageAttendees: React.FC = () => {
                                     <button
                                         onClick={() => {
                                             const rsvpLink = `${window.location.origin}/#/rsvp/${meeting.id}`;
-                                            const message = `[ระบบบริหารจัดการการประชุมโรงพยาบาลศรีเทพ]\nขอเชิญเข้าร่วมประชุม "${meeting.title}"\n📅 วันที่: ${meeting.date}\n⏰ เวลา: ${meeting.time}\n📍 สถานที่: ${meeting.location}\n\nกรุณาตอบรับการเข้าร่วมที่ลิงก์นี้:\n${rsvpLink}`;
+                                            const message = `📌 [เชิญเข้าร่วมประชุม]\n━━━━━━━━━━━━━━\n📝 หัวข้อ: ${meeting.title}\n📅 วันที่: ${meeting.date}\n⏰ เวลา: ${meeting.time}\n📍 สถานที่: ${meeting.location}\n━━━━━━━━━━━━━━\n\n✅ กรุณาตอบรับได้ที่:\n${rsvpLink}\n\n[ระบบบริหารจัดการการประชุมโรงพยาบาลศรีเทพ]`;
                                             window.open(`https://line.me/R/msg/text/?${encodeURIComponent(message)}`, '_blank');
                                         }}
                                         className="whitespace-nowrap flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg shadow-sm transition-all text-sm font-medium"
@@ -243,7 +268,24 @@ export const ManageAttendees: React.FC = () => {
                                                         {a.status === 'PENDING' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200"><Clock size={12} /> รอตอบรับ</span>}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                        <button onClick={() => handleRemove(a.id)} className="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"><Trash size={16} /></button>
+                                                        <div className="flex justify-end gap-2">
+                                                            {(() => {
+                                                                const u = a.userId ? users.find(user => user.id === a.userId) : null;
+                                                                if (u?.lineUserId) {
+                                                                    return (
+                                                                        <button
+                                                                            onClick={() => sendBotInvite(a, u)}
+                                                                            className="text-green-600 hover:bg-green-50 p-2 rounded-lg transition-colors"
+                                                                            title="ส่งบัตรเชิญผ่าน LINE Bot"
+                                                                        >
+                                                                            <Share2 size={16} />
+                                                                        </button>
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            })()}
+                                                            <button onClick={() => handleRemove(a.id)} className="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="ลบรายชื่อ"><Trash size={16} /></button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

@@ -386,8 +386,165 @@ app.post('/api/notifications', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── LIFF Registration ────────────────────────────────────────────────────────
+// ─── LINE Notification (Flex Message) ────────────────────────────────────────
+app.post('/api/line/send-invite', async (req, res) => {
+  try {
+    const { lineUserId, meeting, rsvpLink } = req.body;
+    const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 
+    if (!token) {
+      return res.status(400).json({ error: 'LINE_CHANNEL_ACCESS_TOKEN is not configured' });
+    }
+
+    const flexMessage = {
+      type: "flex",
+      altText: `ขอเชิญเข้าร่วมประชุม: ${meeting.title}`,
+      contents: {
+        type: "bubble",
+        header: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            {
+              type: "text",
+              text: "เชิญเข้าร่วมประชุม 📅",
+              weight: "bold",
+              color: "#ffffff",
+              size: "sm"
+            }
+          ],
+          backgroundColor: "#EA580C"
+        },
+        body: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            {
+              type: "text",
+              text: meeting.title,
+              weight: "bold",
+              size: "xl",
+              wrap: true
+            },
+            {
+              type: "box",
+              layout: "vertical",
+              margin: "lg",
+              spacing: "sm",
+              contents: [
+                {
+                  type: "box",
+                  layout: "baseline",
+                  spacing: "sm",
+                  contents: [
+                    {
+                      type: "text",
+                      text: "📅 วันที่",
+                      color: "#999999",
+                      size: "xs",
+                      flex: 1
+                    },
+                    {
+                      type: "text",
+                      text: meeting.date,
+                      wrap: true,
+                      color: "#666666",
+                      size: "xs",
+                      flex: 4
+                    }
+                  ]
+                },
+                {
+                  type: "box",
+                  layout: "baseline",
+                  spacing: "sm",
+                  contents: [
+                    {
+                      type: "text",
+                      text: "⏰ เวลา",
+                      color: "#999999",
+                      size: "xs",
+                      flex: 1
+                    },
+                    {
+                      type: "text",
+                      text: meeting.time,
+                      wrap: true,
+                      color: "#666666",
+                      size: "xs",
+                      flex: 4
+                    }
+                  ]
+                },
+                {
+                  type: "box",
+                  layout: "baseline",
+                  spacing: "sm",
+                  contents: [
+                    {
+                      type: "text",
+                      text: "📍 สถานที่",
+                      color: "#999999",
+                      size: "xs",
+                      flex: 1
+                    },
+                    {
+                      type: "text",
+                      text: meeting.location,
+                      wrap: true,
+                      color: "#666666",
+                      size: "xs",
+                      flex: 4
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        footer: {
+          type: "box",
+          layout: "vertical",
+          spacing: "sm",
+          contents: [
+            {
+              type: "button",
+              style: "primary",
+              height: "sm",
+              action: {
+                type: "uri",
+                label: "กดเพื่อตอบรับการประชุม",
+                uri: rsvpLink
+              },
+              color: "#EA580C"
+            }
+          ],
+          flex: 0
+        }
+      }
+    };
+
+    const response = await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        to: lineUserId,
+        messages: [flexMessage]
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to send LINE message');
+
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('LINE Send Error:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // ─── Seed ─────────────────────────────────────────────────────────────────────
 app.get('/api/seed', async (req, res) => {
