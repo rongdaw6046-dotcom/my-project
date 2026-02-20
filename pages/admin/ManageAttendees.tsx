@@ -68,7 +68,7 @@ export const ManageAttendees: React.FC = () => {
                     await addAttendee({
                         meetingId: meeting.id,
                         userId: u.id,
-                        name: u.name,
+                        name: `${u.name} ${u.surname}`,
                         position: u.position || 'Staff',
                         status: 'PENDING'
                     });
@@ -223,7 +223,13 @@ export const ManageAttendees: React.FC = () => {
                                                 <tr key={a.id} className="hover:bg-gray-50 transition-colors">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                         <div className="flex items-center gap-2">
-                                                            {a.name}
+                                                            {(() => {
+                                                                if (a.userId) {
+                                                                    const u = users.find(user => user.id === a.userId);
+                                                                    return u ? `${u.name} ${u.surname}` : a.name;
+                                                                }
+                                                                return a.name;
+                                                            })()}
                                                             {/* Check if this attendee is an internal user with LINE ID */}
                                                             {a.userId && users.find(u => u.id === a.userId)?.lineUserId && (
                                                                 <Share2 size={14} className="text-green-500 fill-green-100" title="เชื่อมต่อ LINE แล้ว" />
