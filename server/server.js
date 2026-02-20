@@ -297,7 +297,11 @@ app.get('/api/documents/:id/download', async (req, res) => {
     const fileBuffer = Buffer.from(doc.file_data, 'base64');
 
     res.setHeader('Content-Type', doc.mime_type || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(doc.name)}"`);
+
+    // Check for inline query param
+    const disposition = req.query.inline === 'true' ? 'inline' : 'attachment';
+    res.setHeader('Content-Disposition', `${disposition}; filename="${encodeURIComponent(doc.name)}"`);
+
     res.send(fileBuffer);
   } catch (e) {
     console.error(e);
