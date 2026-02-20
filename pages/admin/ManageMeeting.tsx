@@ -185,74 +185,20 @@ export const ManageMeeting: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Additional Info Row */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Budget */}
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                                <h3 className="font-bold text-gray-800 mb-5 flex items-center gap-2 pb-3 border-b border-gray-100">
-                                    <DollarSign size={20} className="text-orange-600" /> งบประมาณ
-                                </h3>
-                                <div>
-                                    <input
-                                        type="number"
-                                        value={formData.budget}
-                                        onChange={e => setFormData({ ...formData, budget: parseFloat(e.target.value) })}
-                                        className="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500 py-2.5 px-3 text-right"
-                                        placeholder="0.00"
-                                    />
-                                    <p className="text-xs text-gray-500 mt-2 text-right">บาท</p>
-                                </div>
-                            </div>
-
-                            {/* Minutes */}
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                                <h3 className="font-bold text-gray-800 mb-5 flex items-center gap-2 pb-3 border-b border-gray-100">
-                                    <FileText size={20} className="text-orange-600" /> รายงานการประชุม
-                                </h3>
-                                <div className="space-y-3">
-                                    {(formData.minutesFiles || []).map((file, idx) => (
-                                        <div key={idx} className="flex justify-between items-center bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm">
-                                            <div className="flex items-center gap-2 truncate">
-                                                <FileText size={16} className="text-blue-600 flex-shrink-0" />
-                                                <span className="text-blue-900 truncate">{file.name}</span>
-                                            </div>
-                                            <button type="button" onClick={() => removeFile(idx)} className="text-red-400 hover:text-red-600 bg-white rounded-full p-1 shadow-sm"><Trash size={14} /></button>
-                                        </div>
-                                    ))}
-                                    <div
-                                        className="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50 transition-all text-sm font-medium flex items-center justify-center gap-2 relative cursor-pointer group"
-                                    >
-                                        <input
-                                            type="file"
-                                            multiple
-                                            accept=".pdf,.jpg,.jpeg,.png"
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            onChange={async (e) => {
-                                                if (e.target.files && e.target.files.length > 0) {
-                                                    const newFiles = [...(formData.minutesFiles || [])];
-                                                    for (let i = 0; i < e.target.files.length; i++) {
-                                                        const file = e.target.files[i];
-                                                        if (file.size > 2 * 1024 * 1024) { // 2MB Limit
-                                                            alert(`ไฟล์ ${file.name} มีขนาดใหญ่เกิน 2MB`);
-                                                            continue;
-                                                        }
-
-                                                        // Convert to Base64
-                                                        const base64 = await new Promise<string>((resolve) => {
-                                                            const reader = new FileReader();
-                                                            reader.onload = () => resolve(reader.result as string);
-                                                            reader.readAsDataURL(file);
-                                                        });
-
-                                                        newFiles.push({ name: file.name, url: base64 });
-                                                    }
-                                                    setFormData({ ...formData, minutesFiles: newFiles });
-                                                }
-                                            }}
-                                        />
-                                        <Upload size={16} /> อัปโหลดไฟล์รายงาน (PDF, JPG, PNG)
-                                    </div>
-                                </div>
+                        {/* Budget */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h3 className="font-bold text-gray-800 mb-5 flex items-center gap-2 pb-3 border-b border-gray-100">
+                                <DollarSign size={20} className="text-orange-600" /> งบประมาณ
+                            </h3>
+                            <div>
+                                <input
+                                    type="number"
+                                    value={formData.budget}
+                                    onChange={e => setFormData({ ...formData, budget: parseFloat(e.target.value) })}
+                                    className="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500 py-2.5 px-3 text-right"
+                                    placeholder="0.00"
+                                />
+                                <p className="text-xs text-gray-500 mt-2 text-right">บาท</p>
                             </div>
                         </div>
 
