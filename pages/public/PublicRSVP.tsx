@@ -66,7 +66,7 @@ export const PublicRSVP: React.FC = () => {
                     <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-yellow-400 opacity-20 rounded-full blur-xl"></div>
 
                     <h1 className="text-xl font-bold text-white relative z-10">แบบตอบรับการเข้าร่วมประชุม</h1>
-                    <p className="text-orange-100 text-sm mt-1 relative z-10 opacity-90">ระบบจัดการการประชุม มหาวิทยาลัยขอนแก่น</p>
+                    <p className="text-orange-100 text-sm mt-1 relative z-10 opacity-90">ระบบจัดการการประชุมโรงพยาบาลศรีเทพ</p>
                 </div>
 
                 <div className="p-8">
@@ -147,7 +147,7 @@ export const PublicRSVP: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <p className="fixed bottom-4 text-xs text-gray-400">© KKU Meeting System</p>
+            <p className="fixed bottom-4 text-xs text-gray-400">©Meeting System</p>
         </div>
     );
 };
