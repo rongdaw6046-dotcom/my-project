@@ -386,160 +386,269 @@ app.post('/api/notifications', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── LINE Notification (Flex Message) ────────────────────────────────────────
-app.post('/api/line/send-invite', async (req, res) => {
+// ─── LINE Helper ─────────────────────────────────────────────────────────────
+const sendLineFlexMessage = async (lineUserId, altText, flexContents) => {
+  const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+  if (!token) throw new Error('LINE_CHANNEL_ACCESS_TOKEN is not configured');
+
+  const response = await fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      to: lineUserId,
+      messages: [{ type: 'flex', altText, contents: flexContents }]
+    })
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to send LINE message');
+  return data;
+};
+
+// ─── Scheduled Reminders ─────────────────────────────────────────────────────
+const checkAndSendReminders = async () => {
   try {
-    const { lineUserId, meeting, rsvpLink } = req.body;
-    const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+    console.log('⏰ Checking for meeting reminders...');
+    // Tomorrow in YYYY-MM-DD (Thai time)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateString = tomorrow.toISOString().split('T')[0];
 
-    if (!token) {
-      return res.status(400).json({ error: 'LINE_CHANNEL_ACCESS_TOKEN is not configured' });
-    }
+    const { rows: meetings } = await pool.query(
+      "SELECT * FROM meetings WHERE date = $1 AND status = 'UPCOMING' AND reminder_sent = false",
+      [dateString]
+    );
 
-    const flexMessage = {
-      type: "flex",
-      altText: `ขอเชิญเข้าร่วมประชุม: ${meeting.title}`,
-      contents: {
-        type: "bubble",
-        header: {
-          type: "box",
-          layout: "vertical",
-          contents: [
-            {
-              type: "text",
-              text: "เชิญเข้าร่วมประชุม 📅",
-              weight: "bold",
-              color: "#ffffff",
-              size: "sm"
-            }
-          ],
-          backgroundColor: "#EA580C"
-        },
-        body: {
-          type: "box",
-          layout: "vertical",
-          contents: [
-            {
-              type: "text",
-              text: meeting.title,
-              weight: "bold",
-              size: "xl",
-              wrap: true
-            },
-            {
+    for (const meeting of meetings) {
+      console.log(`📌 Sending reminders for: ${meeting.title}`);
+      const { rows: participants } = await pool.query(`
+        SELECT u.line_user_id, u.name, u.surname 
+        FROM attendees a
+        JOIN users u ON a.user_id = u.id
+        WHERE a.meeting_id = $1 AND u.line_user_id IS NOT NULL
+      `, [meeting.id]);
+
+      for (const p of participants) {
+        try {
+          const flexContents = {
+            type: "bubble",
+            header: {
               type: "box",
               layout: "vertical",
-              margin: "lg",
-              spacing: "sm",
+              contents: [{ type: "text", text: "แจ้งเตือนการประชุมพรุ่งนี้ 🔔", weight: "bold", color: "#ffffff", size: "sm" }],
+              backgroundColor: "#22C55E"
+            },
+            body: {
+              type: "box",
+              layout: "vertical",
               contents: [
+                { type: "text", text: meeting.title, weight: "bold", size: "xl", wrap: true },
                 {
                   type: "box",
-                  layout: "baseline",
+                  layout: "vertical",
+                  margin: "lg",
                   spacing: "sm",
                   contents: [
                     {
-                      type: "text",
-                      text: "📅 วันที่",
-                      color: "#999999",
-                      size: "xs",
-                      flex: 1
+                      type: "box",
+                      layout: "baseline",
+                      spacing: "sm",
+                      contents: [
+                        { type: "text", text: "📅 วันที่", color: "#999999", size: "xs", flex: 1 },
+                        { type: "text", text: meeting.date, wrap: true, color: "#666666", size: "xs", flex: 4 }
+                      ]
                     },
                     {
-                      type: "text",
-                      text: meeting.date,
-                      wrap: true,
-                      color: "#666666",
-                      size: "xs",
-                      flex: 4
-                    }
-                  ]
-                },
-                {
-                  type: "box",
-                  layout: "baseline",
-                  spacing: "sm",
-                  contents: [
-                    {
-                      type: "text",
-                      text: "⏰ เวลา",
-                      color: "#999999",
-                      size: "xs",
-                      flex: 1
+                      type: "box",
+                      layout: "baseline",
+                      spacing: "sm",
+                      contents: [
+                        { type: "text", text: "⏰ เวลา", color: "#999999", size: "xs", flex: 1 },
+                        { type: "text", text: meeting.time, wrap: true, color: "#666666", size: "xs", flex: 4 }
+                      ]
                     },
                     {
-                      type: "text",
-                      text: meeting.time,
-                      wrap: true,
-                      color: "#666666",
-                      size: "xs",
-                      flex: 4
-                    }
-                  ]
-                },
-                {
-                  type: "box",
-                  layout: "baseline",
-                  spacing: "sm",
-                  contents: [
-                    {
-                      type: "text",
-                      text: "📍 สถานที่",
-                      color: "#999999",
-                      size: "xs",
-                      flex: 1
-                    },
-                    {
-                      type: "text",
-                      text: meeting.location,
-                      wrap: true,
-                      color: "#666666",
-                      size: "xs",
-                      flex: 4
+                      type: "box",
+                      layout: "baseline",
+                      spacing: "sm",
+                      contents: [
+                        { type: "text", text: "📍 สถานที่", color: "#999999", size: "xs", flex: 1 },
+                        { type: "text", text: meeting.location, wrap: true, color: "#666666", size: "xs", flex: 4 }
+                      ]
                     }
                   ]
                 }
               ]
             }
-          ]
-        },
-        footer: {
-          type: "box",
-          layout: "vertical",
-          spacing: "sm",
-          contents: [
-            {
-              type: "button",
-              style: "primary",
-              height: "sm",
-              action: {
-                type: "uri",
-                label: "กดเพื่อตอบรับการประชุม",
-                uri: rsvpLink
-              },
-              color: "#EA580C"
-            }
-          ],
-          flex: 0
+          };
+
+          await sendLineFlexMessage(p.line_user_id, `แจ้งเตือนการประชุมพรุ่งนี้: ${meeting.title}`, flexContents);
+        } catch (err) {
+          console.error(`❌ Send Error (${p.line_user_id}):`, err.message);
         }
+      }
+
+      // Mark as sent
+      await pool.query('UPDATE meetings SET reminder_sent = true WHERE id = $1', [meeting.id]);
+    }
+  } catch (err) {
+    console.error('❌ Reminder Check Error:', err);
+  }
+};
+
+// Trigger check every hour, run at 8 AM Thai time
+setInterval(() => {
+  const now = new Date();
+  const thaiHour = (now.getUTCHours() + 7) % 24;
+  if (thaiHour === 8) {
+    checkAndSendReminders();
+  }
+}, 3600000);
+
+// Add manual trigger endpoint for admin testing
+app.post('/api/admin/trigger-reminders', async (req, res) => {
+  try {
+    await checkAndSendReminders();
+    res.json({ success: true, message: 'Reminder check triggered manually' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─── LINE Notification (Flex Message Invitation) ─────────────────────────────
+app.post('/api/line/send-invite', async (req, res) => {
+  try {
+    const { lineUserId, meeting, rsvpLink } = req.body;
+
+    const flexMessage = {
+      type: "bubble",
+      header: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: "เชิญเข้าร่วมประชุม 📅",
+            weight: "bold",
+            color: "#ffffff",
+            size: "sm"
+          }
+        ],
+        backgroundColor: "#EA580C"
+      },
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: meeting.title,
+            weight: "bold",
+            size: "xl",
+            wrap: true
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "lg",
+            spacing: "sm",
+            contents: [
+              {
+                type: "box",
+                layout: "baseline",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "📅 วันที่",
+                    color: "#999999",
+                    size: "xs",
+                    flex: 1
+                  },
+                  {
+                    type: "text",
+                    text: meeting.date,
+                    wrap: true,
+                    color: "#666666",
+                    size: "xs",
+                    flex: 4
+                  }
+                ]
+              },
+              {
+                type: "box",
+                layout: "baseline",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "⏰ เวลา",
+                    color: "#999999",
+                    size: "xs",
+                    flex: 1
+                  },
+                  {
+                    type: "text",
+                    text: meeting.time,
+                    wrap: true,
+                    color: "#666666",
+                    size: "xs",
+                    flex: 4
+                  }
+                ]
+              },
+              {
+                type: "box",
+                layout: "baseline",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "📍 สถานที่",
+                    color: "#999999",
+                    size: "xs",
+                    flex: 1
+                  },
+                  {
+                    type: "text",
+                    text: meeting.location,
+                    wrap: true,
+                    color: "#666666",
+                    size: "xs",
+                    flex: 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        spacing: "sm",
+        contents: [
+          {
+            type: "button",
+            style: "primary",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "กดเพื่อตอบรับการประชุม",
+              uri: rsvpLink
+            },
+            color: "#EA580C"
+          }
+        ],
+        flex: 0
       }
     };
 
-    const response = await fetch('https://api.line.me/v2/bot/message/push', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        to: lineUserId,
-        messages: [flexMessage]
-      })
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to send LINE message');
-
-    res.json({ success: true, data });
+    await sendLineFlexMessage(lineUserId, `ขอเชิญเข้าร่วมประชุม: ${meeting.title}`, flexMessage);
+    res.json({ success: true });
   } catch (e) {
     console.error('LINE Send Error:', e);
     res.status(500).json({ error: e.message });

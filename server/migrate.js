@@ -74,6 +74,22 @@ const migrate = async () => {
       console.log('ℹ️ Columns file_data, mime_type already exist in documents');
     }
 
+    // 5. Alter Meetings table to add reminder_sent
+    const { rows: reminderColumns } = await client.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name='meetings' AND column_name='reminder_sent';
+    `);
+
+    if (reminderColumns.length === 0) {
+      await client.query(`
+        ALTER TABLE meetings ADD COLUMN reminder_sent BOOLEAN DEFAULT FALSE;
+      `);
+      console.log('✅ Added column: reminder_sent to meetings');
+    } else {
+      console.log('ℹ️ Column reminder_sent already exists in meetings');
+    }
+
     console.log('🎉 Migration completed successfully!');
   } catch (err) {
     console.error('❌ Migration failed:', err);

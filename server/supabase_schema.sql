@@ -27,8 +27,10 @@ CREATE TABLE IF NOT EXISTS meetings (
     location TEXT,
     status TEXT DEFAULT 'UPCOMING' CHECK (status IN ('UPCOMING', 'COMPLETED')),
     budget NUMERIC(10, 2),
-    "minutesFiles" JSONB DEFAULT '[]'::jsonb,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    minutes_files TEXT DEFAULT '[]',
+    minutes_summary TEXT DEFAULT '',
+    reminder_sent BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 3. Agendas Table

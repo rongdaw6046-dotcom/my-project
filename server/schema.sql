@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS meetings (
     location VARCHAR(255),
     status ENUM('UPCOMING', 'COMPLETED') DEFAULT 'UPCOMING',
     budget DECIMAL(10, 2),
-    minutes_files LONGTEXT -- Storing JSON array of file objects
+    minutes_files LONGTEXT, -- Storing JSON array of file objects
+    reminder_sent BOOLEAN DEFAULT FALSE
 );
 
 -- 3. Agendas Table
