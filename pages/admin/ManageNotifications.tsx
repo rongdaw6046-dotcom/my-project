@@ -11,6 +11,7 @@ export const ManageNotifications: React.FC = () => {
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [targetUserId, setTargetUserId] = useState(''); // Empty = Broadcast
+    const [sendLine, setSendLine] = useState(false);
 
     useEffect(() => {
         fetchNotifications();
@@ -24,11 +25,13 @@ export const ManageNotifications: React.FC = () => {
             userId: targetUserId || undefined,
             title,
             message,
-            type: 'System'
+            type: 'System',
+            sendLine
         });
 
         setTitle('');
         setMessage('');
+        setSendLine(false);
         alert('ส่งการแจ้งเตือนเรียบร้อยแล้ว');
     };
 
@@ -82,6 +85,18 @@ export const ManageNotifications: React.FC = () => {
                                                 onChange={e => setMessage(e.target.value)}
                                                 required
                                             ></textarea>
+                                        </div>
+                                        <div className="flex items-center gap-2 px-1">
+                                            <input
+                                                type="checkbox"
+                                                id="sendLine"
+                                                className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                                checked={sendLine}
+                                                onChange={e => setSendLine(e.target.checked)}
+                                            />
+                                            <label htmlFor="sendLine" className="text-sm font-medium text-gray-700 cursor-pointer">
+                                                ส่งไปที่ LINE ด้วย (Send to LINE)
+                                            </label>
                                         </div>
                                         <button type="submit" className="w-full bg-orange-600 text-white rounded-lg py-2.5 font-medium hover:bg-orange-700 transition-colors flex justify-center items-center gap-2">
                                             <Send size={18} /> ส่งข้อความ

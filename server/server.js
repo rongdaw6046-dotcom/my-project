@@ -370,11 +370,49 @@ app.get('/api/notifications', async (req, res) => {
 
 app.post('/api/notifications', async (req, res) => {
   try {
-    const { userId, title, message, type } = req.body;
+    const { userId, title, message, type, sendLine } = req.body;
+
+    // 1. Save to Database
     const { rows: newNotif } = await pool.query(
       'INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, $4) RETURNING *',
       [userId || null, title, message, type || 'SYSTEM']
     );
+
+    // 2. Optional: Send to LINE
+    if (sendLine) {
+      const flexContents = {
+        type: "bubble",
+        header: {
+          type: "box",
+          layout: "vertical",
+          contents: [{ type: "text", text: "การแจ้งเตือนจากระบบ 🔔", weight: "bold", color: "#ffffff", size: "sm" }],
+          backgroundColor: "#EA580C"
+        },
+        body: {
+          type: "box",
+          layout: "vertical",
+          contents: [
+            { type: "text", text: title, weight: "bold", size: "xl", wrap: true },
+            { type: "text", text: message, margin: "md", wrap: true, color: "#666666", size: "sm" }
+          ]
+        }
+      };
+
+      if (userId) {
+        // Individual notification
+        const { rows: userRows } = await pool.query('SELECT line_user_id FROM users WHERE id = $1', [userId]);
+        if (userRows[0]?.line_user_id) {
+          await sendLineFlexMessage(userRows[0].line_user_id, `แจ้งเตือน: ${title}`, flexContents).catch(console.error);
+        }
+      } else {
+        // Broadcast
+        const { rows: allUsers } = await pool.query('SELECT line_user_id FROM users WHERE line_user_id IS NOT NULL');
+        for (const u of allUsers) {
+          await sendLineFlexMessage(u.line_user_id, `แจ้งเตือน: ${title}`, flexContents).catch(console.error);
+        }
+      }
+    }
+
     const row = newNotif[0];
     res.json({
       id: row.id,
