@@ -33,12 +33,12 @@ export const AdminMeetingTabs: React.FC<AdminMeetingTabsProps> = ({ meetingId })
               to={tab.path}
               className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all
                   ${isActive
-                  ? 'border-emerald-600 text-emerald-600 bg-emerald-50'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'bg-orange-50 text-orange-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
               <div className="flex items-center gap-3">
-                <Icon size={18} className={isActive ? 'text-emerald-600' : 'text-gray-400'} />
+                <Icon size={18} className={isActive ? 'text-orange-600' : 'text-gray-400'} />
                 <span>{tab.label}</span>
               </div>
               {isActive && <ChevronRight size={16} className="text-orange-400" />}

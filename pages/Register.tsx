@@ -52,32 +52,32 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl flex overflow-hidden min-h-[600px]">
 
         {/* Left Side - Image/Brand (Same as Login) */}
-        <div className="hidden md:flex w-5/12 bg-emerald-600 p-12 flex-col justify-between relative overflow-hidden">
+        <div className="hidden md:flex w-5/12 bg-orange-600 p-12 flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-20"></div>
           <div className="relative z-10">
             <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain bg-white/20 backdrop-blur-sm rounded-xl mb-6 p-1" />
             <h2 className="text-3xl font-bold text-white mb-2">MeetingSrithep</h2>
-            <p className="text-emerald-100">ระบบบริหารจัดการการประชุม<br />โรงพยาบาลศรีเทพ</p>
+            <p className="text-orange-100">ระบบบริหารจัดการการประชุม<br />โรงพยาบาลศรีเทพ</p>
           </div>
 
           <div className="relative z-10">
             <p className="text-white font-medium mb-4">เข้าร่วมกับเราวันนี้</p>
-            <ul className="text-emerald-100 text-sm space-y-2">
+            <ul className="text-orange-100 text-sm space-y-2">
               <li className="flex items-center gap-2">✓ จัดการวาระการประชุมได้ง่าย</li>
               <li className="flex items-center gap-2">✓ ติดตามสถานะผู้เข้าร่วม</li>
               <li className="flex items-center gap-2">✓ เข้าถึงเอกสารการประชุมออนไลน์</li>
             </ul>
           </div>
 
-          <div className="relative z-10 text-emerald-100 text-sm mt-8">
+          <div className="relative z-10 text-orange-100 text-sm mt-8">
             © Computer Center
           </div>
-          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-500 rounded-full opacity-50"></div>
-          <div className="absolute -top-24 -left-24 w-64 h-64 bg-emerald-500 rounded-full opacity-50"></div>
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-orange-500 rounded-full opacity-50"></div>
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-orange-500 rounded-full opacity-50"></div>
         </div>
 
         {/* Right Side - Register Form */}
@@ -100,7 +100,7 @@ export const Register: React.FC = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
                     placeholder="ชื่อจริง"
                     required
                   />
@@ -114,7 +114,7 @@ export const Register: React.FC = () => {
                     name="surname"
                     value={formData.surname}
                     onChange={handleChange}
-                    className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
                     placeholder="นามสกุล"
                     required
                   />
@@ -171,7 +171,7 @@ export const Register: React.FC = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
                     placeholder="••••••••"
                     required
                   />
@@ -188,7 +188,7 @@ export const Register: React.FC = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
                     placeholder="••••••••"
                     required
                   />
@@ -200,7 +200,7 @@ export const Register: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5 mt-2"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-0.5 mt-2"
             >
               สมัครสมาชิก <ArrowRight size={20} />
             </button>
@@ -208,7 +208,7 @@ export const Register: React.FC = () => {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
-              มีบัญชีผู้ใช้งานแล้ว? <Link to="/" className="text-emerald-600 font-bold hover:underline">เข้าสู่ระบบ</Link>
+              มีบัญชีผู้ใช้งานแล้ว? <Link to="/" className="text-orange-600 font-bold hover:underline">เข้าสู่ระบบ</Link>
             </p>
           </div>
         </div>
