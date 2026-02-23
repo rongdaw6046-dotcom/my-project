@@ -112,4 +112,5 @@ export interface MeetingContextType {
   // Notification Actions
   fetchNotifications: () => void;
   sendNotification: (notif: Omit<Notification, 'id' | 'isRead' | 'createdAt'>) => void;
+  markAsRead: (id: string) => void;
 }
