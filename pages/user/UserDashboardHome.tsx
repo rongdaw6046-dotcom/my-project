@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, MapPin, CheckSquare, FileText, ChevronRight, TrendingUp, CalendarDays } from 'lucide-react';
+import { Calendar, Clock, MapPin, CheckSquare, FileText, ChevronRight, TrendingUp, CalendarDays, Bell } from 'lucide-react';
 
 const parseMeetingDate = (dateStr: string): Date | null => {
     const m1 = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -15,8 +15,12 @@ const isSameDay = (a: Date, b: Date) =>
     a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 export const UserDashboardHome: React.FC = () => {
-    const { meetings, user, attendees, agendas } = useApp();
+    const { meetings, user, attendees, agendas, notifications, fetchNotifications } = useApp();
     const today = new Date();
+
+    useEffect(() => {
+        if (user) fetchNotifications();
+    }, [user]);
 
     if (!user) return null;
 
@@ -71,6 +75,23 @@ export const UserDashboardHome: React.FC = () => {
                 <StatCard icon={TrendingUp} label="ผ่านมาแล้ว" value={completedCount} color="bg-green-500" to="/user/history" />
                 <StatCard icon={CheckSquare} label="งานค้างอยู่" value={pendingActions.length} color="bg-purple-500" to="/user/actions" />
             </div>
+
+            {/* Notifications Alert */}
+            {notifications.filter(n => !n.isRead).length > 0 && (
+                <div className="bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 rounded-2xl p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 flex-shrink-0 animate-pulse">
+                        <Bell size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-gray-800 dark:text-white text-sm">
+                            {user.name} มีการแจ้งเตือนใหม่ {notifications.filter(n => !n.isRead).length} รายการ
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                            {notifications.filter(n => !n.isRead)[0].title}: {notifications.filter(n => !n.isRead)[0].message}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Today's meetings */}
             {todayMeetings.length > 0 && (

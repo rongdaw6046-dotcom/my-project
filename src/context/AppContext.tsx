@@ -317,6 +317,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fetchNotifications();
   };
 
+  const markAsRead = async (id: string) => {
+    await fetch(`${API}/notifications/${id}/read`, { method: 'PATCH' });
+    fetchNotifications();
+  };
+
   return (
     <AppContext.Provider value={{
       user, users, meetings, agendas, attendees, isLoading,
@@ -329,7 +334,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       fetchAttendees,
       documents, notifications,
       fetchDocuments, addDocument, deleteDocument,
-      fetchNotifications, sendNotification
+      fetchNotifications, sendNotification, markAsRead
     }}>
       {children}
     </AppContext.Provider>

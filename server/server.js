@@ -388,6 +388,14 @@ app.post('/api/notifications', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.patch('/api/notifications/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('UPDATE notifications SET is_read = TRUE WHERE id = $1', [id]);
+    res.status(204).send();
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── LINE Helper ─────────────────────────────────────────────────────────────
 const sendLineFlexMessage = async (lineUserId, altText, flexContents) => {
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;

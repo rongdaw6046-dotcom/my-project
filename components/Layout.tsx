@@ -3,11 +3,12 @@ import { useApp } from '../src/context/AppContext';
 import { UserRole } from '../types';
 import { translations } from '../src/translations';
 import {
-  LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
+  Bell, LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
   Users, Menu as MenuIcon, PlusCircle, History, BookOpen,
-  CheckSquare, Settings, Home
+  CheckSquare, Settings, Home, X
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { NotificationCenter } from './NotificationCenter';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout, lang } = useApp();
@@ -15,6 +16,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isNotifOpen, setIsNotifOpen] = React.useState(false);
+
+  const { notifications, fetchNotifications } = useApp();
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  React.useEffect(() => {
+    if (user) fetchNotifications();
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -80,12 +89,25 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <div className="min-h-screen bg-[#F3F4F6] flex">
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-72 bg-white border-r border-gray-200 fixed h-full z-10">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
-          <div>
-            <h1 className="font-bold text-gray-800 text-lg leading-tight">Meeting Srithep</h1>
-            <p className="text-xs text-gray-400">ระบบบริหารจัดการการประชุม</p>
+        <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+            <div>
+              <h1 className="font-bold text-gray-800 text-lg leading-tight">Meeting Srithep</h1>
+              <p className="text-xs text-gray-400">ระบบบริหารจัดการการประชุม</p>
+            </div>
           </div>
+          <button
+            onClick={() => setIsNotifOpen(!isNotifOpen)}
+            className="relative p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all"
+          >
+            <Bell size={20} />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
         </div>
 
         <div className="p-4 space-y-1 flex-1 overflow-y-auto">
@@ -137,6 +159,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Notification Sidebar Overlay */}
+      {isNotifOpen && (
+        <div className="fixed inset-0 z-[60] flex justify-end">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsNotifOpen(false)} />
+          <aside className="relative w-full max-w-sm h-full shadow-2xl animate-in slide-in-from-right duration-300">
+            <NotificationCenter onClose={() => setIsNotifOpen(false)} />
+          </aside>
         </div>
       )}
 
