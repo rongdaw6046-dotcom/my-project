@@ -91,8 +91,8 @@ export const AdminDashboard: React.FC = () => {
                     value={pendingCount.toString()}
                     subtitle="คน รอตอบรับ"
                     icon={<AlertCircle size={24} />}
-                    colorClass="text-orange-600"
-                    bgClass="bg-orange-50"
+                    colorClass="text-emerald-600"
+                    bgClass="bg-emerald-50"
                 />
             </div>
 
@@ -102,9 +102,9 @@ export const AdminDashboard: React.FC = () => {
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                         <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
                             <h3 className="font-bold text-gray-800 flex items-center gap-2">
-                                <Calendar className="text-orange-600" size={20} /> การประชุมเร็วๆ นี้
+                                <Calendar className="text-emerald-600" size={20} /> การประชุมเร็วๆ นี้
                             </h3>
-                            <Link to="/admin/meetings" className="text-sm text-orange-600 hover:text-orange-700 font-medium flex items-center">
+                            <Link to="/admin/meetings" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
                                 ดูทั้งหมด <ArrowRight size={16} className="ml-1" />
                             </Link>
                         </div>
@@ -112,7 +112,7 @@ export const AdminDashboard: React.FC = () => {
                             {upcomingMeetings.length > 0 ? (
                                 upcomingMeetings.slice(0, 5).map(meeting => (
                                     <div key={meeting.id} className="p-5 hover:bg-gray-50 transition-colors flex flex-col sm:flex-row gap-4 sm:items-center">
-                                        <div className="flex-shrink-0 w-16 h-16 bg-orange-50 rounded-xl flex flex-col items-center justify-center text-orange-700 border border-orange-100">
+                                        <div className="flex-shrink-0 w-16 h-16 bg-emerald-50 rounded-xl flex flex-col items-center justify-center text-emerald-700 border border-emerald-100">
                                             <span className="text-xl font-bold leading-none">{new Date(meeting.date).getDate()}</span>
                                             <span className="text-xs font-medium uppercase">{new Date(meeting.date).toLocaleDateString('th-TH', { month: 'short' })}</span>
                                         </div>
@@ -140,7 +140,7 @@ export const AdminDashboard: React.FC = () => {
                                 <div className="p-12 text-center text-gray-500">
                                     <Calendar size={48} className="mx-auto mb-3 text-gray-300" />
                                     <p>ไม่มีการประชุมที่กำลังจะมาถึง</p>
-                                    <Link to="/admin/meetings/new" className="text-orange-600 font-medium mt-2 inline-block">สร้างการประชุมใหม่</Link>
+                                    <Link to="/admin/meetings/new" className="text-emerald-600 font-medium mt-2 inline-block">สร้างการประชุมใหม่</Link>
                                 </div>
                             )}
                         </div>
@@ -148,13 +148,13 @@ export const AdminDashboard: React.FC = () => {
 
                     {/* Quick Actions */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Link to="/admin/meetings/new" className="flex items-center p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                        <Link to="/admin/meetings/new" className="flex items-center p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
                             <div className="p-3 bg-white/20 rounded-lg mr-4">
                                 <List size={24} />
                             </div>
                             <div>
                                 <h4 className="font-bold">สร้างการประชุมใหม่</h4>
-                                <p className="text-orange-100 text-sm">เพิ่มวาระและกำหนดการ</p>
+                                <p className="text-emerald-100 text-sm">เพิ่มวาระและกำหนดการ</p>
                             </div>
                         </Link>
                         <div onClick={() => navigate('/admin/users')} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer group">

@@ -32,10 +32,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       onClick={() => setIsMobileMenuOpen(false)}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
         ${isActive(to)
-          ? 'bg-orange-600 text-white shadow-md shadow-orange-200'
-          : 'text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-700 dark:hover:text-orange-400'}`}
+          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
+          : 'text-gray-600 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-400'}`}
     >
-      <Icon size={20} className={isActive(to) ? 'text-white' : 'text-gray-400 group-hover:text-orange-600'} />
+      <Icon size={20} className={isActive(to) ? 'text-white' : 'text-gray-400 group-hover:text-emerald-600'} />
       <span>{label}</span>
     </Link>
   );
@@ -94,7 +94,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         <div className="p-4 border-t border-gray-100">
           <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold">
               {user?.name?.charAt(0)?.toUpperCase() || <UserIcon size={20} />}
             </div>
             <div className="flex-1 min-w-0">

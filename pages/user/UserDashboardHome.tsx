@@ -50,7 +50,7 @@ export const UserDashboardHome: React.FC = () => {
                 <p className="text-2xl font-bold text-gray-800">{value}</p>
                 <p className="text-sm text-gray-500">{label}</p>
             </div>
-            <ChevronRight size={16} className="ml-auto text-gray-300 group-hover:text-orange-400" />
+            <ChevronRight size={16} className="ml-auto text-gray-300 group-hover:text-emerald-400" />
         </Link>
     );
 
@@ -66,7 +66,7 @@ export const UserDashboardHome: React.FC = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard icon={Calendar} label="การประชุมวันนี้" value={todayMeetings.length} color="bg-orange-500" to="/user/dashboard" />
+                <StatCard icon={Calendar} label="การประชุมวันนี้" value={todayMeetings.length} color="bg-emerald-500" to="/user/dashboard" />
                 <StatCard icon={CalendarDays} label="กำลังจะมาถึง" value={upcomingMeetings.length} color="bg-blue-500" to="/user/calendar" />
                 <StatCard icon={TrendingUp} label="ผ่านมาแล้ว" value={completedCount} color="bg-green-500" to="/user/history" />
                 <StatCard icon={CheckSquare} label="งานค้างอยู่" value={pendingActions.length} color="bg-purple-500" to="/user/actions" />
@@ -74,7 +74,7 @@ export const UserDashboardHome: React.FC = () => {
 
             {/* Today's meetings */}
             {todayMeetings.length > 0 && (
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+                <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white">
                     <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Calendar size={20} /> การประชุมวันนี้</h3>
                     <div className="space-y-3">
                         {todayMeetings.map(m => (
@@ -82,7 +82,7 @@ export const UserDashboardHome: React.FC = () => {
                                 className="flex items-center justify-between bg-white/20 hover:bg-white/30 backdrop-blur rounded-xl p-4 transition-colors">
                                 <div>
                                     <p className="font-semibold">{m.title}</p>
-                                    <div className="flex items-center gap-3 text-sm text-orange-100 mt-1">
+                                    <div className="flex items-center gap-3 text-sm text-emerald-100 mt-1">
                                         <span className="flex items-center gap-1"><Clock size={13} /> {m.time} น.</span>
                                         <span className="flex items-center gap-1"><MapPin size={13} /> {m.location}</span>
                                     </div>
@@ -98,26 +98,26 @@ export const UserDashboardHome: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                        <h3 className="font-bold text-gray-700 flex items-center gap-2"><Calendar size={16} className="text-orange-500" /> การประชุมที่กำลังจะมาถึง</h3>
-                        <Link to="/user/dashboard" className="text-xs text-orange-600 hover:underline">ดูทั้งหมด</Link>
+                        <h3 className="font-bold text-gray-700 flex items-center gap-2"><Calendar size={16} className="text-emerald-500" /> การประชุมที่กำลังจะมาถึง</h3>
+                        <Link to="/user/dashboard" className="text-xs text-emerald-600 hover:underline">ดูทั้งหมด</Link>
                     </div>
                     <div className="divide-y divide-gray-50">
                         {upcomingMeetings.slice(0, 4).map(m => {
                             const d = parseMeetingDate(m.date);
                             return (
                                 <Link key={m.id} to={`/user/meetings/${m.id}`}
-                                    className="flex items-center gap-4 px-5 py-3 hover:bg-orange-50 transition-colors group">
+                                    className="flex items-center gap-4 px-5 py-3 hover:bg-emerald-50 transition-colors group">
                                     {d && (
                                         <div className="text-center w-10 flex-shrink-0">
-                                            <div className="text-xs font-semibold text-orange-500">{d.toLocaleDateString('th-TH', { month: 'short' })}</div>
+                                            <div className="text-xs font-semibold text-emerald-500">{d.toLocaleDateString('th-TH', { month: 'short' })}</div>
                                             <div className="text-xl font-bold text-gray-800 leading-none">{d.getDate()}</div>
                                         </div>
                                     )}
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-800 truncate group-hover:text-orange-700">{m.title}</p>
+                                        <p className="text-sm font-medium text-gray-800 truncate group-hover:text-emerald-700">{m.title}</p>
                                         <p className="text-xs text-gray-400">{m.time} น. · {m.location}</p>
                                     </div>
-                                    <ChevronRight size={14} className="text-gray-300 group-hover:text-orange-400 flex-shrink-0" />
+                                    <ChevronRight size={14} className="text-gray-300 group-hover:text-emerald-400 flex-shrink-0" />
                                 </Link>
                             );
                         })}
