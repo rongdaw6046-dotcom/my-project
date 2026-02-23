@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bell, Send, Clock, User, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Bell, Send, Clock, User, CheckCircle, Search } from 'lucide-react';
 
 export const ManageNotifications: React.FC = () => {
     const navigate = useNavigate();
@@ -11,6 +11,12 @@ export const ManageNotifications: React.FC = () => {
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [targetUserId, setTargetUserId] = useState(''); // Empty = Broadcast
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredUsers = users.filter(u =>
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.position?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     useEffect(() => {
         fetchNotifications();
@@ -53,16 +59,31 @@ export const ManageNotifications: React.FC = () => {
                                     <form onSubmit={handleSend} className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">ส่งถึง</label>
-                                            <select
-                                                className="block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-orange-500 focus:border-orange-500 bg-white"
-                                                value={targetUserId}
-                                                onChange={e => setTargetUserId(e.target.value)}
-                                            >
-                                                <option value="">ทุกคน (Broadcast)</option>
-                                                {users.map(u => (
-                                                    <option key={u.id} value={u.id}>{u.name} ({u.position})</option>
-                                                ))}
-                                            </select>
+                                            <div className="space-y-2">
+                                                <div className="relative">
+                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="ค้นหาชื่อหรือตำแหน่ง..."
+                                                        className="block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 text-sm focus:ring-orange-500 focus:border-orange-500"
+                                                        value={searchTerm}
+                                                        onChange={e => setSearchTerm(e.target.value)}
+                                                    />
+                                                </div>
+                                                <select
+                                                    className="block w-full border border-gray-300 rounded-lg p-2.5 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                                                    value={targetUserId}
+                                                    onChange={e => setTargetUserId(e.target.value)}
+                                                >
+                                                    <option value="">ทุกคน (Broadcast)</option>
+                                                    {filteredUsers.map(u => (
+                                                        <option key={u.id} value={u.id}>{u.name} ({u.position})</option>
+                                                    ))}
+                                                    {filteredUsers.length === 0 && searchTerm && (
+                                                        <option disabled>ไม่พบรายชื่อที่ค้นหา</option>
+                                                    )}
+                                                </select>
+                                            </div>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">หัวข้อ</label>
