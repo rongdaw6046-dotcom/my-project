@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../src/context/AppContext';
 import { UserRole } from '../types';
-import { LogOut, LayoutDashboard, User as UserIcon, Calendar, Users, Settings, Menu as MenuIcon, PlusCircle } from 'lucide-react';
+import { LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays, Users, Settings, Menu as MenuIcon, PlusCircle } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -64,6 +64,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           ) : (
             <>
               <NavItem to="/user/dashboard" icon={Calendar} label="การประชุมของฉัน" />
+              <NavItem to="/user/calendar" icon={CalendarDays} label="ปฏิทินการประชุม" />
             </>
           )}
         </div>
@@ -113,6 +114,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               ) : (
                 <>
                   <NavItem to="/user/dashboard" icon={Calendar} label="การประชุมของฉัน" />
+                  <NavItem to="/user/calendar" icon={CalendarDays} label="ปฏิทินการประชุม" />
                 </>
               )}
               <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-red-600 w-full text-left">

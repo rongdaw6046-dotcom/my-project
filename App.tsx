@@ -17,6 +17,7 @@ import { ManageNotifications } from './pages/admin/ManageNotifications';
 import { Reports } from './pages/admin/Reports';
 import { UserDashboard } from './pages/user/UserDashboard';
 import { MeetingDetail } from './pages/user/MeetingDetail';
+import { UserCalendar } from './pages/user/UserCalendar';
 import { PublicRSVP } from './pages/public/PublicRSVP';
 import { UserRole } from './types';
 
@@ -112,6 +113,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/user/dashboard" element={
         <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
           <UserDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/user/calendar" element={
+        <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+          <UserCalendar />
         </ProtectedRoute>
       } />
       <Route path="/user/meetings/:id" element={
