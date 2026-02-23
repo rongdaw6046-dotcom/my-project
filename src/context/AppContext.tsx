@@ -136,6 +136,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         alert(`ไม่สามารถบันทึกข้อมูลได้: ${err.error}`);
         return;
       }
+
+      const updatedData = await res.json();
+
+      // Synchronize current user state if updated
+      if (user && id.toString() === user.id.toString()) {
+        setUser(updatedData);
+        localStorage.setItem('kku_user', JSON.stringify(updatedData));
+      }
+
       await fetchData();
       alert('บันทึกข้อมูลเรียบร้อยแล้ว');
     } catch (err: any) {
