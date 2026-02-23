@@ -13,6 +13,8 @@ export const translations = {
         manageMeetings: 'รายการการประชุม',
         createMeeting: 'สร้างการประชุม',
         manageUsers: 'จัดการผู้ใช้งาน',
+        notifications: 'จัดการการแจ้งเตือน',
+        adminReports: 'รายงานสรุปผล',
         logout: 'ออกจากระบบ',
 
         // Settings Page
@@ -57,6 +59,8 @@ export const translations = {
         manageMeetings: 'Meetings List',
         createMeeting: 'Create Meeting',
         manageUsers: 'User Management',
+        notifications: 'Push Notifications',
+        adminReports: 'System Reports',
         logout: 'Logout',
 
         // Settings Page

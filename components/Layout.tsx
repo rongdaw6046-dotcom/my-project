@@ -5,7 +5,7 @@ import { translations } from '../src/translations';
 import {
   Bell, LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
   Users, Menu as MenuIcon, PlusCircle, History, BookOpen,
-  CheckSquare, Settings, Home, X
+  CheckSquare, Settings, Home, X, BarChart2
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NotificationCenter } from './NotificationCenter';
@@ -76,9 +76,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <>
       <SectionLabel label={t.adminMenu} />
       <NavItem to="/admin/dashboard" icon={LayoutDashboard} label={t.adminDashboard} />
+      <NavItem to="/admin/users" icon={Users} label={t.manageUsers} />
+      <NavItem to="/admin/notifications" icon={Bell} label={t.notifications} />
+      <NavItem to="/admin/reports" icon={BarChart2} label={t.adminReports} />
+
+      <SectionLabel label={t.meetings} />
       <NavItem to="/admin/meetings" icon={Calendar} label={t.manageMeetings} />
       <NavItem to="/admin/meetings/new" icon={PlusCircle} label={t.createMeeting} />
-      <NavItem to="/admin/users" icon={Users} label={t.manageUsers} />
 
       <SectionLabel label={t.account} />
       <NavItem to="/user/settings" icon={Settings} label={t.accountSettings} />
