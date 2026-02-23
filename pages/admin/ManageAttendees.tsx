@@ -197,16 +197,16 @@ export const ManageAttendees: React.FC = () => {
                     <div className="flex flex-col xl:flex-row gap-6">
                         {/* List Section */}
                         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px] flex flex-col">
-                            <div className="p-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
-                                <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-                                    <Users size={20} className="text-orange-600" /> รายชื่อผู้เข้าร่วม
+                            <div className="p-5 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4 bg-gray-50/50">
+                                <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2 min-w-fit">
+                                    <Users size={20} className="text-orange-600 flex-shrink-0" /> <span className="truncate">รายชื่อผู้เข้าร่วม</span>
                                 </h3>
-                                <div className="flex gap-2 w-full sm:w-auto">
+                                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
                                     <button
                                         onClick={() => window.print()}
                                         className="whitespace-nowrap flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg shadow-sm transition-all text-sm font-medium"
                                     >
-                                        <Printer size={16} /> พิมพ์รายงาน
+                                        <Printer size={16} /> <span className="hidden md:inline">พิมพ์รายงาน</span>
                                     </button>
                                     <button
                                         onClick={() => {
@@ -216,9 +216,9 @@ export const ManageAttendees: React.FC = () => {
                                         }}
                                         className="whitespace-nowrap flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg shadow-sm transition-all text-sm font-medium"
                                     >
-                                        <Share2 size={16} /> แชร์ลิงก์
+                                        <Share2 size={16} /> <span className="hidden md:inline">แชร์ลิงก์</span>
                                     </button>
-                                    <div className="relative flex-1 sm:w-56">
+                                    <div className="relative flex-1 min-w-[150px] sm:w-48 lg:w-64">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                             <Search size={16} />
                                         </div>
@@ -236,10 +236,10 @@ export const ManageAttendees: React.FC = () => {
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50 text-gray-500">
                                         <tr>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">ชื่อ - นามสกุล</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">ตำแหน่ง</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">สถานะ</th>
-                                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">จัดการ</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/3 min-w-[180px]">ชื่อ - นามสกุล</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/4">ตำแหน่ง</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/4">สถานะ</th>
+                                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider w-20">จัดการ</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
