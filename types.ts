@@ -80,6 +80,11 @@ export interface MeetingContextType {
   documents: MeetingDocument[]; // New
   notifications: Notification[]; // New
   isLoading: boolean;
+  // Preferences
+  lang: 'th' | 'en';
+  darkMode: boolean;
+  setLang: (lang: 'th' | 'en') => void;
+  setDarkMode: (dark: boolean) => void;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (user: Omit<User, 'id' | 'allowedMeetingIds'>) => Promise<boolean>;

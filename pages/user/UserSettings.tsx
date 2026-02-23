@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../src/context/AppContext';
-import { Settings, User as UserIcon, Lock, Monitor, Save, Eye, EyeOff, Check } from 'lucide-react';
+import { Settings, User as UserIcon, Lock, Monitor, Save, Eye, EyeOff, Check, Sun, Moon, Globe } from 'lucide-react';
 
 type Tab = 'profile' | 'security' | 'preferences';
 
 export const UserSettings: React.FC = () => {
-    const { user, updateUser } = useApp();
+    const { user, updateUser, lang, darkMode, setLang, setDarkMode } = useApp();
     const [activeTab, setActiveTab] = useState<Tab>('profile');
     const [saved, setSaved] = useState(false);
 
@@ -16,10 +16,6 @@ export const UserSettings: React.FC = () => {
     const [passwords, setPasswords] = useState({ current: '', newPass: '', confirm: '' });
     const [showPass, setShowPass] = useState({ current: false, new: false, confirm: false });
     const [passError, setPassError] = useState('');
-
-    // Preferences
-    const [lang, setLang] = useState<'th' | 'en'>('th');
-    const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -32,9 +28,6 @@ export const UserSettings: React.FC = () => {
                 phone: stored.phone || '',
             });
         }
-        const prefs = JSON.parse(localStorage.getItem('user_prefs') || '{}');
-        setLang(prefs.lang || 'th');
-        setDarkMode(prefs.darkMode || false);
     }, [user]);
 
     if (!user) return null;
@@ -46,9 +39,7 @@ export const UserSettings: React.FC = () => {
 
     const handleSaveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Save name/surname/position to server
         await updateUser(user.id, { name: profile.name, surname: profile.surname, position: profile.position, username: user.username, role: user.role });
-        // Save extra fields to localStorage
         localStorage.setItem(`profile_extra_${user.id}`, JSON.stringify({ email: profile.email, phone: profile.phone }));
         showSaved();
     };
@@ -65,7 +56,7 @@ export const UserSettings: React.FC = () => {
     };
 
     const handleSavePreferences = () => {
-        localStorage.setItem('user_prefs', JSON.stringify({ lang, darkMode }));
+        // setLang and setDarkMode already save to localStorage via AppContext
         showSaved();
     };
 
@@ -208,33 +199,48 @@ export const UserSettings: React.FC = () => {
 
                             {/* Language */}
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-3">ภาษาของระบบ</label>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Globe size={16} className="text-gray-500" />
+                                    <label className="text-sm font-semibold text-gray-700">ภาษาของระบบ</label>
+                                </div>
                                 <div className="flex gap-3">
-                                    {[{ val: 'th', label: '🇹🇭 ภาษาไทย' }, { val: 'en', label: '🇬🇧 English' }].map(l => (
+                                    {([{ val: 'th', label: '🇹🇭 ภาษาไทย' }, { val: 'en', label: '🇬🇧 English' }] as const).map(l => (
                                         <button key={l.val}
-                                            onClick={() => setLang(l.val as 'th' | 'en')}
+                                            onClick={() => setLang(l.val)}
                                             className={`px-5 py-3 rounded-xl border text-sm font-medium transition-all ${lang === l.val ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
                                         >
                                             {l.label}
                                         </button>
                                     ))}
                                 </div>
+                                <p className="text-xs text-gray-400 mt-2">
+                                    {lang === 'th' ? '⚙️ ภาษาที่เลือกจะถูกบันทึกและแสดงในลำดับถัดไป' : '⚙️ Selected language is saved and will apply on next update.'}
+                                </p>
                             </div>
 
                             {/* Dark mode */}
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-3">โหมดหน้าจอ</label>
-                                <div className="flex gap-3">
-                                    {[{ val: false, label: '☀️ Light Mode' }, { val: true, label: '🌙 Dark Mode' }].map(m => (
-                                        <button key={String(m.val)}
-                                            onClick={() => setDarkMode(m.val)}
-                                            className={`px-5 py-3 rounded-xl border text-sm font-medium transition-all ${darkMode === m.val ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
-                                        >
-                                            {m.label}
-                                        </button>
-                                    ))}
+                                <div className="flex items-center gap-2 mb-3">
+                                    {darkMode ? <Moon size={16} className="text-indigo-500" /> : <Sun size={16} className="text-yellow-500" />}
+                                    <label className="text-sm font-semibold text-gray-700">โหมดหน้าจอ</label>
                                 </div>
-                                {darkMode && <p className="text-xs text-gray-400 mt-2">* Dark Mode จะพร้อมใช้งานในอัปเดตถัดไป</p>}
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setDarkMode(false)}
+                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all ${!darkMode ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
+                                    >
+                                        <Sun size={16} /> Light Mode
+                                    </button>
+                                    <button
+                                        onClick={() => setDarkMode(true)}
+                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all ${darkMode ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
+                                    >
+                                        <Moon size={16} /> Dark Mode
+                                    </button>
+                                </div>
+                                {darkMode && (
+                                    <p className="text-xs text-indigo-500 mt-2 font-medium">🌙 Dark Mode เปิดใช้งานแล้ว</p>
+                                )}
                             </div>
 
                             <button onClick={handleSavePreferences} className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">

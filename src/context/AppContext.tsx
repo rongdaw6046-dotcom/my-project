@@ -20,6 +20,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // --- Preferences (lang & dark mode) ---
+  const [lang, setLangState] = useState<'th' | 'en'>(() => {
+    const prefs = JSON.parse(localStorage.getItem('user_prefs') || '{}');
+    return prefs.lang || 'th';
+  });
+  const [darkMode, setDarkModeState] = useState<boolean>(() => {
+    const prefs = JSON.parse(localStorage.getItem('user_prefs') || '{}');
+    return prefs.darkMode || false;
+  });
+
+  const setLang = (newLang: 'th' | 'en') => {
+    setLangState(newLang);
+    const prefs = JSON.parse(localStorage.getItem('user_prefs') || '{}');
+    localStorage.setItem('user_prefs', JSON.stringify({ ...prefs, lang: newLang }));
+  };
+
+  const setDarkMode = (dark: boolean) => {
+    setDarkModeState(dark);
+    const prefs = JSON.parse(localStorage.getItem('user_prefs') || '{}');
+    localStorage.setItem('user_prefs', JSON.stringify({ ...prefs, darkMode: dark }));
+  };
+
+  // Apply dark mode class on <html> element
+  useEffect(() => {
+    const html = document.documentElement;
+    if (darkMode) {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // Apply lang attribute on <html> element
+  useEffect(() => {
+    document.documentElement.setAttribute('lang', lang);
+  }, [lang]);
+
   // --- 1. Fetch All Data ---
   const fetchData = async () => {
     try {
@@ -274,6 +311,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider value={{
       user, users, meetings, agendas, attendees, isLoading,
+      lang, darkMode, setLang, setDarkMode,
       login, logout, register,
       addUser, updateUser, deleteUser, updateUserPermissions,
       addMeeting, updateMeeting, deleteMeeting,
