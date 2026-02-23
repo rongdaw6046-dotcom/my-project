@@ -370,59 +370,13 @@ app.get('/api/notifications', async (req, res) => {
 
 app.post('/api/notifications', async (req, res) => {
   try {
-    const { userId, title, message, type, sendLine } = req.body;
+    const { userId, title, message, type } = req.body;
 
     // 1. Save to Database
     const { rows: newNotif } = await pool.query(
       'INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, $4) RETURNING *',
       [userId || null, title, message, type || 'SYSTEM']
     );
-
-    // 2. Optional: Send to LINE
-    if (sendLine) {
-      console.log(`📢 Attempting to send LINE notification for: ${title}`);
-      const flexContents = {
-        type: "bubble",
-        header: {
-          type: "box",
-          layout: "vertical",
-          contents: [{ type: "text", text: "การแจ้งเตือนจากระบบ 🔔", weight: "bold", color: "#ffffff", size: "sm" }],
-          backgroundColor: "#EA580C"
-        },
-        body: {
-          type: "box",
-          layout: "vertical",
-          contents: [
-            { type: "text", text: title, weight: "bold", size: "xl", wrap: true },
-            { type: "text", text: message, margin: "md", wrap: true, color: "#666666", size: "sm" }
-          ]
-        }
-      };
-
-      if (userId) {
-        // Individual notification
-        console.log(`👤 Sending to individual user: ${userId}`);
-        const { rows: userRows } = await pool.query('SELECT line_user_id, name FROM users WHERE id = $1', [userId]);
-        if (userRows[0]?.line_user_id) {
-          console.log(`✅ Found LINE ID for ${userRows[0].name}: ${userRows[0].line_user_id}`);
-          await sendLineFlexMessage(userRows[0].line_user_id, `แจ้งเตือน: ${title}`, flexContents)
-            .then(() => console.log('🚀 Message sent successfully'))
-            .catch(err => console.error('❌ LINE Send Error:', err.message));
-        } else {
-          console.warn(`⚠️ User ${userId} (${userRows[0]?.name || 'Unknown'}) does not have a line_user_id`);
-        }
-      } else {
-        // Broadcast
-        console.log('🌍 Sending broadcast to all users with LINE ID');
-        const { rows: allUsers } = await pool.query('SELECT line_user_id, name FROM users WHERE line_user_id IS NOT NULL');
-        console.log(`👥 Found ${allUsers.length} users with LINE ID`);
-        for (const u of allUsers) {
-          console.log(`➡️ Sending to ${u.name}`);
-          await sendLineFlexMessage(u.line_user_id, `แจ้งเตือน: ${title}`, flexContents)
-            .catch(err => console.error(`❌ LINE Send Error for ${u.name}:`, err.message));
-        }
-      }
-    }
 
     const row = newNotif[0];
     res.json({
