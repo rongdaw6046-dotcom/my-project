@@ -380,6 +380,7 @@ app.post('/api/notifications', async (req, res) => {
 
     // 2. Optional: Send to LINE
     if (sendLine) {
+      console.log(`📢 Attempting to send LINE notification for: ${title}`);
       const flexContents = {
         type: "bubble",
         header: {
@@ -400,15 +401,25 @@ app.post('/api/notifications', async (req, res) => {
 
       if (userId) {
         // Individual notification
-        const { rows: userRows } = await pool.query('SELECT line_user_id FROM users WHERE id = $1', [userId]);
+        console.log(`👤 Sending to individual user: ${userId}`);
+        const { rows: userRows } = await pool.query('SELECT line_user_id, name FROM users WHERE id = $1', [userId]);
         if (userRows[0]?.line_user_id) {
-          await sendLineFlexMessage(userRows[0].line_user_id, `แจ้งเตือน: ${title}`, flexContents).catch(console.error);
+          console.log(`✅ Found LINE ID for ${userRows[0].name}: ${userRows[0].line_user_id}`);
+          await sendLineFlexMessage(userRows[0].line_user_id, `แจ้งเตือน: ${title}`, flexContents)
+            .then(() => console.log('🚀 Message sent successfully'))
+            .catch(err => console.error('❌ LINE Send Error:', err.message));
+        } else {
+          console.warn(`⚠️ User ${userId} (${userRows[0]?.name || 'Unknown'}) does not have a line_user_id`);
         }
       } else {
         // Broadcast
-        const { rows: allUsers } = await pool.query('SELECT line_user_id FROM users WHERE line_user_id IS NOT NULL');
+        console.log('🌍 Sending broadcast to all users with LINE ID');
+        const { rows: allUsers } = await pool.query('SELECT line_user_id, name FROM users WHERE line_user_id IS NOT NULL');
+        console.log(`👥 Found ${allUsers.length} users with LINE ID`);
         for (const u of allUsers) {
-          await sendLineFlexMessage(u.line_user_id, `แจ้งเตือน: ${title}`, flexContents).catch(console.error);
+          console.log(`➡️ Sending to ${u.name}`);
+          await sendLineFlexMessage(u.line_user_id, `แจ้งเตือน: ${title}`, flexContents)
+            .catch(err => console.error(`❌ LINE Send Error for ${u.name}:`, err.message));
         }
       }
     }
