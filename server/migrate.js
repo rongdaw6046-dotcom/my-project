@@ -90,6 +90,22 @@ const migrate = async () => {
       console.log('ℹ️ Column reminder_sent already exists in meetings');
     }
 
+    // 6. Alter Users table to add profile_image
+    const { rows: userColumns } = await client.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name='users' AND column_name='profile_image';
+    `);
+
+    if (userColumns.length === 0) {
+      await client.query(`
+        ALTER TABLE users ADD COLUMN profile_image TEXT;
+      `);
+      console.log('✅ Added column: profile_image to users');
+    } else {
+      console.log('ℹ️ Column profile_image already exists in users');
+    }
+
     console.log('🎉 Migration completed successfully!');
   } catch (err) {
     console.error('❌ Migration failed:', err);

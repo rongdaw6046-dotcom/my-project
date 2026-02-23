@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT DEFAULT 'USER' CHECK (role IN ('ADMIN', 'USER')),
     line_user_id TEXT,
     allowed_meeting_ids JSONB DEFAULT '[]'::jsonb,
+    profile_image TEXT DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

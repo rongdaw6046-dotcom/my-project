@@ -94,8 +94,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         <div className="p-4 border-t border-gray-100">
           <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
-              {user?.name?.charAt(0)?.toUpperCase() || <UserIcon size={20} />}
+            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold overflow-hidden">
+              {user?.profileImage ? (
+                <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                user?.name?.charAt(0)?.toUpperCase() || <UserIcon size={20} />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-gray-800 truncate">{user?.name} {user?.surname}</p>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { translations } from '../../src/translations';
-import { Settings, User as UserIcon, Lock, Monitor, Save, Eye, EyeOff, Check, Sun, Moon, Globe } from 'lucide-react';
+import { Settings, User as UserIcon, Lock, Monitor, Save, Eye, EyeOff, Check, Sun, Moon, Globe, PlusCircle } from 'lucide-react';
 
 type Tab = 'profile' | 'security' | 'preferences';
 
@@ -12,7 +12,7 @@ export const UserSettings: React.FC = () => {
     const [saved, setSaved] = useState(false);
 
     // Profile form
-    const [profile, setProfile] = useState({ name: '', surname: '', position: '', email: '', phone: '' });
+    const [profile, setProfile] = useState({ name: '', surname: '', position: '', email: '', phone: '', profileImage: '' });
 
     // Security form
     const [passwords, setPasswords] = useState({ current: '', newPass: '', confirm: '' });
@@ -28,6 +28,7 @@ export const UserSettings: React.FC = () => {
                 position: user.position || '',
                 email: stored.email || '',
                 phone: stored.phone || '',
+                profileImage: user.profileImage || '',
             });
         }
     }, [user]);
@@ -41,9 +42,31 @@ export const UserSettings: React.FC = () => {
 
     const handleSaveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        await updateUser(user.id, { name: profile.name, surname: profile.surname, position: profile.position, username: user.username, role: user.role });
+        await updateUser(user.id, {
+            name: profile.name,
+            surname: profile.surname,
+            position: profile.position,
+            username: user.username,
+            role: user.role,
+            profileImage: profile.profileImage
+        });
         localStorage.setItem(`profile_extra_${user.id}`, JSON.stringify({ email: profile.email, phone: profile.phone }));
         showSaved();
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert(lang === 'th' ? 'ขนาดไฟล์ห้ามเกิน 2MB' : 'File size must be less than 2MB');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfile(p => ({ ...p, profileImage: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleChangePassword = async (e: React.FormEvent) => {
@@ -120,14 +143,24 @@ export const UserSettings: React.FC = () => {
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
                         <form onSubmit={handleSaveProfile} className="space-y-5">
-                            <div className="flex items-center gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
-                                <div className="w-16 h-16 rounded-2xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold text-2xl">
-                                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                            <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-gray-100 dark:border-gray-700">
+                                <div className="relative group">
+                                    <div className="w-24 h-24 rounded-2xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold text-3xl overflow-hidden border-2 border-dashed border-orange-200 dark:border-orange-800">
+                                        {profile.profileImage ? (
+                                            <img src={profile.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            user.name?.charAt(0)?.toUpperCase() || 'U'
+                                        )}
+                                    </div>
+                                    <label className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-gray-700 rounded-lg shadow-md border border-gray-100 dark:border-gray-600 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                        <PlusCircle size={16} className="text-orange-600" />
+                                        <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                                    </label>
                                 </div>
-                                <div>
-                                    <p className="font-bold text-gray-800 dark:text-white text-lg">{user.name} {user.surname}</p>
+                                <div className="text-center sm:text-left">
+                                    <p className="font-bold text-gray-800 dark:text-white text-xl">{user.name} {user.surname}</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">{user.position}</p>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500">@{user.username}</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">@{user.username}</p>
                                 </div>
                             </div>
 

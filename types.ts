@@ -13,6 +13,7 @@ export interface User {
   role: UserRole;
   allowedMeetingIds: string[];
   lineUserId?: string; // LINE User ID (U...)
+  profileImage?: string; // Base64 string
 }
 
 export interface AgendaItem {

@@ -26,7 +26,8 @@ const formatUser = (row) => ({
   position: row.position,
   role: row.role,
   lineUserId: row.line_user_id || null,
-  allowedMeetingIds: row.allowed_meeting_ids || []
+  allowedMeetingIds: row.allowed_meeting_ids || [],
+  profileImage: row.profile_image || null
 });
 
 const formatMeeting = (row) => ({
@@ -118,6 +119,7 @@ app.put('/api/users/:id', async (req, res) => {
 
     if (password) { query += `, password=$${idx}`; params.push(password); idx++; }
     if (lineUserId !== undefined) { query += `, line_user_id=$${idx}`; params.push(lineUserId); idx++; }
+    if (req.body.profileImage !== undefined) { query += `, profile_image=$${idx}`; params.push(req.body.profileImage); idx++; }
 
     query += ` WHERE id=$${idx} RETURNING *`;
     params.push(req.params.id);

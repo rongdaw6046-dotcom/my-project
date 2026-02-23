@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
     position VARCHAR(255),
     role ENUM('ADMIN', 'USER') DEFAULT 'USER',
     line_user_id VARCHAR(255) NULL,
-    allowed_meeting_ids TEXT -- Storing JSON array for simplicity
+    allowed_meeting_ids TEXT, -- Storing JSON array for simplicity
+    profile_image LONGTEXT NULL
 );
 
 -- 2. Meetings Table
