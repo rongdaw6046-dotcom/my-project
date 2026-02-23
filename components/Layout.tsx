@@ -81,9 +81,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-72 bg-white border-r border-gray-200 fixed h-full z-10">
         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            M
-          </div>
+          <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
           <div>
             <h1 className="font-bold text-gray-800 text-lg leading-tight">Meeting Srithep</h1>
             <p className="text-xs text-gray-400">ระบบบริหารจัดการการประชุม</p>
@@ -116,7 +114,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Mobile Header */}
       <div className="md:hidden fixed w-full bg-white border-b border-gray-200 z-20 flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center text-white font-bold">M</div>
+          <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
           <span className="font-bold text-gray-800">Meeting Srithep</span>
         </div>
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-600">

@@ -60,7 +60,7 @@ export const Login: React.FC = () => {
         <div className="hidden md:flex w-1/2 bg-orange-600 p-12 flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-20"></div>
           <div className="relative z-10">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white font-bold text-xl mb-6">M</div>
+            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain bg-white/20 backdrop-blur-sm rounded-xl mb-6 p-1" />
             <h2 className="text-3xl font-bold text-white mb-2">MeetingSrithep</h2>
             <p className="text-orange-100">ระบบบริหารจัดการการประชุม<br />โรงพยาบาลศรีเทพ</p>
           </div>
