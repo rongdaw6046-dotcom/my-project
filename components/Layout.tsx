@@ -1,7 +1,11 @@
 import React from 'react';
 import { useApp } from '../src/context/AppContext';
 import { UserRole } from '../types';
-import { LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays, Users, Settings, Menu as MenuIcon, PlusCircle } from 'lucide-react';
+import {
+  LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
+  Users, Menu as MenuIcon, PlusCircle, History, BookOpen,
+  CheckSquare, Settings, Home
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -16,17 +20,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   const isActive = (path: string) => {
-    // Special handling to prevent double highlighting
-    // If we are on "/admin/meetings/new" (Create), we don't want "/admin/meetings" (List) to be active
-    if (path === '/admin/meetings' && location.pathname === '/admin/meetings/new') {
-      return false;
-    }
+    if (path === '/admin/meetings' && location.pathname === '/admin/meetings/new') return false;
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
   const NavItem = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => (
     <Link
       to={to}
+      onClick={() => setIsMobileMenuOpen(false)}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
         ${isActive(to)
           ? 'bg-orange-600 text-white shadow-md shadow-orange-200'
@@ -35,6 +36,29 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <Icon size={20} className={isActive(to) ? 'text-white' : 'text-gray-400 group-hover:text-orange-600'} />
       <span>{label}</span>
     </Link>
+  );
+
+  const SectionLabel = ({ label }: { label: string }) => (
+    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-4 mt-4 first:mt-2">{label}</div>
+  );
+
+  const userNavItems = (
+    <>
+      <SectionLabel label="ภาพรวม" />
+      <NavItem to="/user/home" icon={Home} label="หน้าหลัก" />
+
+      <SectionLabel label="การประชุม" />
+      <NavItem to="/user/dashboard" icon={Calendar} label="การประชุมของฉัน" />
+      <NavItem to="/user/calendar" icon={CalendarDays} label="ปฏิทินการประชุม" />
+      <NavItem to="/user/history" icon={History} label="ประวัติการประชุม" />
+      <NavItem to="/user/reports" icon={BookOpen} label="รายงาน / เอกสาร" />
+
+      <SectionLabel label="งาน" />
+      <NavItem to="/user/actions" icon={CheckSquare} label="งานที่ได้รับมอบหมาย" />
+
+      <SectionLabel label="บัญชี" />
+      <NavItem to="/user/settings" icon={Settings} label="ตั้งค่าบัญชี" />
+    </>
   );
 
   return (
@@ -51,32 +75,28 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
         </div>
 
-        <div className="p-4 space-y-2 flex-1 overflow-y-auto">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-4 mt-2">เมนูหลัก</div>
-
+        <div className="p-4 space-y-1 flex-1 overflow-y-auto">
           {user?.role === UserRole.ADMIN ? (
             <>
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-4 mt-2">เมนูหลัก</div>
               <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="ภาพรวมระบบ" />
               <NavItem to="/admin/meetings" icon={Calendar} label="รายการการประชุม" />
               <NavItem to="/admin/meetings/new" icon={PlusCircle} label="สร้างการประชุม" />
               <NavItem to="/admin/users" icon={Users} label="จัดการผู้ใช้งาน" />
             </>
           ) : (
-            <>
-              <NavItem to="/user/dashboard" icon={Calendar} label="การประชุมของฉัน" />
-              <NavItem to="/user/calendar" icon={CalendarDays} label="ปฏิทินการประชุม" />
-            </>
+            userNavItems
           )}
         </div>
 
         <div className="p-4 border-t border-gray-100">
           <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-              <UserIcon size={20} />
+            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+              {user?.name?.charAt(0)?.toUpperCase() || <UserIcon size={20} />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-gray-800 truncate">{user?.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.role === UserRole.ADMIN ? 'Administrator' : 'User'}</p>
+              <p className="text-sm font-bold text-gray-800 truncate">{user?.name} {user?.surname}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.role === UserRole.ADMIN ? 'Administrator' : user?.position || 'User'}</p>
             </div>
           </div>
           <button
@@ -102,8 +122,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-30" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="bg-white w-64 h-full p-4" onClick={e => e.stopPropagation()}>
-            <div className="space-y-2 mt-12">
+          <div className="bg-white w-72 h-full p-4 overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="space-y-0.5 mt-14">
               {user?.role === UserRole.ADMIN ? (
                 <>
                   <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="ภาพรวมระบบ" />
@@ -112,12 +132,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <NavItem to="/admin/users" icon={Users} label="จัดการผู้ใช้งาน" />
                 </>
               ) : (
-                <>
-                  <NavItem to="/user/dashboard" icon={Calendar} label="การประชุมของฉัน" />
-                  <NavItem to="/user/calendar" icon={CalendarDays} label="ปฏิทินการประชุม" />
-                </>
+                userNavItems
               )}
-              <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-red-600 w-full text-left">
+              <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-red-600 w-full text-left rounded-xl hover:bg-red-50 mt-2">
                 <LogOut size={20} /> ออกจากระบบ
               </button>
             </div>
