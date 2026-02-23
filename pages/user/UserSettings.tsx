@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../src/context/AppContext';
+import { translations } from '../../src/translations';
 import { Settings, User as UserIcon, Lock, Monitor, Save, Eye, EyeOff, Check, Sun, Moon, Globe } from 'lucide-react';
 
 type Tab = 'profile' | 'security' | 'preferences';
 
 export const UserSettings: React.FC = () => {
     const { user, updateUser, lang, darkMode, setLang, setDarkMode } = useApp();
+    const t = translations[lang];
     const [activeTab, setActiveTab] = useState<Tab>('profile');
     const [saved, setSaved] = useState(false);
 
@@ -47,31 +49,30 @@ export const UserSettings: React.FC = () => {
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
         setPassError('');
-        if (passwords.current !== user.password) { setPassError('รหัสผ่านปัจจุบันไม่ถูกต้อง'); return; }
-        if (passwords.newPass.length < 6) { setPassError('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร'); return; }
-        if (passwords.newPass !== passwords.confirm) { setPassError('รหัสผ่านใหม่ไม่ตรงกัน'); return; }
+        if (passwords.current !== user.password) { setPassError(lang === 'th' ? 'รหัสผ่านปัจจุบันไม่ถูกต้อง' : 'Incorrect current password'); return; }
+        if (passwords.newPass.length < 6) { setPassError(lang === 'th' ? 'รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร' : 'New password must be at least 6 characters'); return; }
+        if (passwords.newPass !== passwords.confirm) { setPassError(lang === 'th' ? 'รหัสผ่านใหม่ไม่ตรงกัน' : 'New passwords do not match'); return; }
         await updateUser(user.id, { password: passwords.newPass, name: user.name, surname: user.surname, position: user.position, username: user.username, role: user.role });
         setPasswords({ current: '', newPass: '', confirm: '' });
         showSaved();
     };
 
     const handleSavePreferences = () => {
-        // setLang and setDarkMode already save to localStorage via AppContext
         showSaved();
     };
 
     const tabs: { id: Tab; label: string; icon: any }[] = [
-        { id: 'profile', label: 'ข้อมูลส่วนตัว', icon: UserIcon },
-        { id: 'security', label: 'ความปลอดภัย', icon: Lock },
-        { id: 'preferences', label: 'การแสดงผล', icon: Monitor },
+        { id: 'profile', label: t.profileTab, icon: UserIcon },
+        { id: 'security', label: t.securityTab, icon: Lock },
+        { id: 'preferences', label: t.preferencesTab, icon: Monitor },
     ];
 
     const InputField = ({ label, type = 'text', value, onChange, placeholder }: { label: string; type?: string; value: string; onChange: (v: string) => void; placeholder?: string }) => (
         <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">{label}</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">{label}</label>
             <input
                 type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-                className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:ring-orange-500 focus:border-orange-500 transition-colors"
             />
         </div>
     );
@@ -79,23 +80,23 @@ export const UserSettings: React.FC = () => {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <Settings size={24} className="text-gray-600" /> ตั้งค่าบัญชีผู้ใช้
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <Settings size={24} className="text-gray-600 dark:text-gray-400" /> {t.settingsTitle}
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">จัดการข้อมูลส่วนตัว ความปลอดภัย และการแสดงผล</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.settingsSub}</p>
             </div>
 
             {/* Saved banner */}
             {saved && (
-                <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">
-                    <Check size={16} /> บันทึกเรียบร้อยแล้ว
+                <div className="flex items-center gap-2 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-xl text-sm font-medium">
+                    <Check size={16} /> {t.saveSuccess}
                 </div>
             )}
 
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Sidebar tabs */}
                 <div className="lg:w-56 flex-shrink-0">
-                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-2 flex flex-row lg:flex-col gap-1">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-2 flex flex-row lg:flex-col gap-1">
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             return (
@@ -103,7 +104,7 @@ export const UserSettings: React.FC = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all w-full text-left
-                    ${activeTab === tab.id ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}
+                    ${activeTab === tab.id ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}
                                 >
                                     <Icon size={18} />
                                     <span className="hidden sm:block">{tab.label}</span>
@@ -114,34 +115,34 @@ export const UserSettings: React.FC = () => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
 
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
                         <form onSubmit={handleSaveProfile} className="space-y-5">
-                            <div className="flex items-center gap-4 pb-5 border-b border-gray-100">
-                                <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-2xl">
+                            <div className="flex items-center gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
+                                <div className="w-16 h-16 rounded-2xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold text-2xl">
                                     {user.name?.charAt(0)?.toUpperCase() || 'U'}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-gray-800 text-lg">{user.name} {user.surname}</p>
-                                    <p className="text-sm text-gray-500">{user.position}</p>
-                                    <p className="text-xs text-gray-400">@{user.username}</p>
+                                    <p className="font-bold text-gray-800 dark:text-white text-lg">{user.name} {user.surname}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{user.position}</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500">@{user.username}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputField label="ชื่อ" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="ชื่อ" />
-                                <InputField label="นามสกุล" value={profile.surname} onChange={v => setProfile(p => ({ ...p, surname: v }))} placeholder="นามสกุล" />
+                                <InputField label={lang === 'th' ? 'ชื่อ' : 'First Name'} value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} placeholder="" />
+                                <InputField label={lang === 'th' ? 'นามสกุล' : 'Last Name'} value={profile.surname} onChange={v => setProfile(p => ({ ...p, surname: v }))} placeholder="" />
                             </div>
-                            <InputField label="ตำแหน่ง/แผนก" value={profile.position} onChange={v => setProfile(p => ({ ...p, position: v }))} placeholder="เช่น นักวิชาการ, หัวหน้าฝ่าย" />
+                            <InputField label={lang === 'th' ? 'ตำแหน่ง/แผนก' : 'Position/Department'} value={profile.position} onChange={v => setProfile(p => ({ ...p, position: v }))} placeholder="" />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputField label="อีเมล" type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="example@email.com" />
-                                <InputField label="เบอร์โทรศัพท์" value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} placeholder="0xx-xxx-xxxx" />
+                                <InputField label={lang === 'th' ? 'อีเมล' : 'Email'} type="email" value={profile.email} onChange={v => setProfile(p => ({ ...p, email: v }))} placeholder="example@email.com" />
+                                <InputField label={lang === 'th' ? 'เบอร์โทรศัพท์' : 'Phone'} value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} placeholder="0xx-xxx-xxxx" />
                             </div>
                             <div className="pt-2">
                                 <button type="submit" className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
-                                    <Save size={16} /> บันทึกข้อมูล
+                                    <Save size={16} /> {t.saveBtn}
                                 </button>
                             </div>
                         </form>
@@ -150,12 +151,12 @@ export const UserSettings: React.FC = () => {
                     {/* Security Tab */}
                     {activeTab === 'security' && (
                         <form onSubmit={handleChangePassword} className="space-y-5">
-                            <h3 className="font-bold text-gray-700">เปลี่ยนรหัสผ่าน</h3>
+                            <h3 className="font-bold text-gray-700 dark:text-gray-200">{t.changePassword}</h3>
                             {passError && (
-                                <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{passError}</div>
+                                <div className="px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl text-sm">{passError}</div>
                             )}
                             {(['current', 'new', 'confirm'] as const).map(k => {
-                                const labels = { current: 'รหัสผ่านปัจจุบัน', new: 'รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)', confirm: 'ยืนยันรหัสผ่านใหม่' };
+                                const labels = { current: t.currentPassword, new: t.newPassword, confirm: t.confirmPassword };
                                 const vals = { current: passwords.current, new: passwords.newPass, confirm: passwords.confirm };
                                 const onChanges = {
                                     current: (v: string) => setPasswords(p => ({ ...p, current: v })),
@@ -170,16 +171,16 @@ export const UserSettings: React.FC = () => {
                                 };
                                 return (
                                     <div key={k}>
-                                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">{labels[k]}</label>
+                                        <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">{labels[k]}</label>
                                         <div className="relative">
                                             <input
                                                 type={shown[k] ? 'text' : 'password'}
                                                 value={vals[k]}
                                                 onChange={e => onChanges[k](e.target.value)}
                                                 required
-                                                className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-orange-500 focus:border-orange-500 pr-10"
+                                                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:ring-orange-500 focus:border-orange-500 pr-10"
                                             />
-                                            <button type="button" onClick={toggles[k]} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <button type="button" onClick={toggles[k]} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                                 {shown[k] ? <EyeOff size={16} /> : <Eye size={16} />}
                                             </button>
                                         </div>
@@ -187,7 +188,7 @@ export const UserSettings: React.FC = () => {
                                 );
                             })}
                             <button type="submit" className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
-                                <Save size={16} /> เปลี่ยนรหัสผ่าน
+                                <Save size={16} /> {t.changePassword}
                             </button>
                         </form>
                     )}
@@ -195,26 +196,26 @@ export const UserSettings: React.FC = () => {
                     {/* Preferences Tab */}
                     {activeTab === 'preferences' && (
                         <div className="space-y-6">
-                            <h3 className="font-bold text-gray-700">การแสดงผล</h3>
+                            <h3 className="font-bold text-gray-700 dark:text-gray-200">{t.preferencesTab}</h3>
 
                             {/* Language */}
                             <div>
                                 <div className="flex items-center gap-2 mb-3">
-                                    <Globe size={16} className="text-gray-500" />
-                                    <label className="text-sm font-semibold text-gray-700">ภาษาของระบบ</label>
+                                    <Globe size={16} className="text-gray-500 dark:text-gray-400" />
+                                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">{t.systemLanguage}</label>
                                 </div>
                                 <div className="flex gap-3">
                                     {([{ val: 'th', label: '🇹🇭 ภาษาไทย' }, { val: 'en', label: '🇬🇧 English' }] as const).map(l => (
                                         <button key={l.val}
                                             onClick={() => setLang(l.val)}
-                                            className={`px-5 py-3 rounded-xl border text-sm font-medium transition-all ${lang === l.val ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
+                                            className={`px-5 py-3 rounded-xl border text-sm font-medium transition-all ${lang === l.val ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-orange-300'}`}
                                         >
                                             {l.label}
                                         </button>
                                     ))}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-2">
-                                    {lang === 'th' ? '⚙️ ภาษาที่เลือกจะถูกบันทึกและแสดงในลำดับถัดไป' : '⚙️ Selected language is saved and will apply on next update.'}
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                                    {t.langNote}
                                 </p>
                             </div>
 
@@ -222,29 +223,29 @@ export const UserSettings: React.FC = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-3">
                                     {darkMode ? <Moon size={16} className="text-indigo-500" /> : <Sun size={16} className="text-yellow-500" />}
-                                    <label className="text-sm font-semibold text-gray-700">โหมดหน้าจอ</label>
+                                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">{t.displayMode}</label>
                                 </div>
                                 <div className="flex gap-3">
                                     <button
                                         onClick={() => setDarkMode(false)}
-                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all ${!darkMode ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
+                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all ${!darkMode ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-orange-300'}`}
                                     >
                                         <Sun size={16} /> Light Mode
                                     </button>
                                     <button
                                         onClick={() => setDarkMode(true)}
-                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all ${darkMode ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}
+                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all ${darkMode ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-orange-300'}`}
                                     >
                                         <Moon size={16} /> Dark Mode
                                     </button>
                                 </div>
                                 {darkMode && (
-                                    <p className="text-xs text-indigo-500 mt-2 font-medium">🌙 Dark Mode เปิดใช้งานแล้ว</p>
+                                    <p className="text-xs text-indigo-500 mt-2 font-medium">{t.darkModeNote}</p>
                                 )}
                             </div>
 
                             <button onClick={handleSavePreferences} className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
-                                <Save size={16} /> บันทึกการตั้งค่า
+                                <Save size={16} /> {t.saveSettings}
                             </button>
                         </div>
                     )}

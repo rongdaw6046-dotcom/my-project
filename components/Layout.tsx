@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../src/context/AppContext';
 import { UserRole } from '../types';
+import { translations } from '../src/translations';
 import {
   LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
   Users, Menu as MenuIcon, PlusCircle, History, BookOpen,
@@ -9,7 +10,8 @@ import {
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, logout } = useApp();
+  const { user, logout, lang } = useApp();
+  const t = translations[lang];
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -31,7 +33,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
         ${isActive(to)
           ? 'bg-orange-600 text-white shadow-md shadow-orange-200'
-          : 'text-gray-600 hover:bg-orange-50 hover:text-orange-700'}`}
+          : 'text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-700 dark:hover:text-orange-400'}`}
     >
       <Icon size={20} className={isActive(to) ? 'text-white' : 'text-gray-400 group-hover:text-orange-600'} />
       <span>{label}</span>
@@ -44,20 +46,33 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   const userNavItems = (
     <>
-      <SectionLabel label="ภาพรวม" />
-      <NavItem to="/user/home" icon={Home} label="หน้าหลัก" />
+      <SectionLabel label={t.overview} />
+      <NavItem to="/user/home" icon={Home} label={t.home} />
 
-      <SectionLabel label="การประชุม" />
-      <NavItem to="/user/dashboard" icon={Calendar} label="การประชุมของฉัน" />
-      <NavItem to="/user/calendar" icon={CalendarDays} label="ปฏิทินการประชุม" />
-      <NavItem to="/user/history" icon={History} label="ประวัติการประชุม" />
-      <NavItem to="/user/reports" icon={BookOpen} label="รายงาน / เอกสาร" />
+      <SectionLabel label={t.meetings} />
+      <NavItem to="/user/dashboard" icon={Calendar} label={t.myMeetings} />
+      <NavItem to="/user/calendar" icon={CalendarDays} label={t.calendar} />
+      <NavItem to="/user/history" icon={History} label={t.history} />
+      <NavItem to="/user/reports" icon={BookOpen} label={t.reports} />
 
-      <SectionLabel label="งาน" />
-      <NavItem to="/user/actions" icon={CheckSquare} label="งานที่ได้รับมอบหมาย" />
+      <SectionLabel label={t.tasks} />
+      <NavItem to="/user/actions" icon={CheckSquare} label={t.assignedTasks} />
 
-      <SectionLabel label="บัญชี" />
-      <NavItem to="/user/settings" icon={Settings} label="ตั้งค่าบัญชี" />
+      <SectionLabel label={t.account} />
+      <NavItem to="/user/settings" icon={Settings} label={t.accountSettings} />
+    </>
+  );
+
+  const adminNavItems = (
+    <>
+      <SectionLabel label={t.adminMenu} />
+      <NavItem to="/admin/dashboard" icon={LayoutDashboard} label={t.adminDashboard} />
+      <NavItem to="/admin/meetings" icon={Calendar} label={t.manageMeetings} />
+      <NavItem to="/admin/meetings/new" icon={PlusCircle} label={t.createMeeting} />
+      <NavItem to="/admin/users" icon={Users} label={t.manageUsers} />
+
+      <SectionLabel label={t.account} />
+      <NavItem to="/user/settings" icon={Settings} label={t.accountSettings} />
     </>
   );
 
@@ -76,17 +91,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
 
         <div className="p-4 space-y-1 flex-1 overflow-y-auto">
-          {user?.role === UserRole.ADMIN ? (
-            <>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-4 mt-2">เมนูหลัก</div>
-              <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="ภาพรวมระบบ" />
-              <NavItem to="/admin/meetings" icon={Calendar} label="รายการการประชุม" />
-              <NavItem to="/admin/meetings/new" icon={PlusCircle} label="สร้างการประชุม" />
-              <NavItem to="/admin/users" icon={Users} label="จัดการผู้ใช้งาน" />
-            </>
-          ) : (
-            userNavItems
-          )}
+          {user?.role === UserRole.ADMIN ? adminNavItems : userNavItems}
         </div>
 
         <div className="p-4 border-t border-gray-100">
@@ -96,14 +101,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-gray-800 truncate">{user?.name} {user?.surname}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.role === UserRole.ADMIN ? 'Administrator' : user?.position || 'User'}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.role === UserRole.ADMIN ? t.admin : t.user}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
             className="flex items-center justify-center gap-2 w-full px-4 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
-            <LogOut size={16} /> ออกจากระบบ
+            <LogOut size={16} /> {t.logout}
           </button>
         </div>
       </aside>
@@ -124,18 +129,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         <div className="md:hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-30" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="bg-white w-72 h-full p-4 overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="space-y-0.5 mt-14">
-              {user?.role === UserRole.ADMIN ? (
-                <>
-                  <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="ภาพรวมระบบ" />
-                  <NavItem to="/admin/meetings" icon={Calendar} label="รายการการประชุม" />
-                  <NavItem to="/admin/meetings/new" icon={PlusCircle} label="สร้างการประชุม" />
-                  <NavItem to="/admin/users" icon={Users} label="จัดการผู้ใช้งาน" />
-                </>
-              ) : (
-                userNavItems
-              )}
+              {user?.role === UserRole.ADMIN ? adminNavItems : userNavItems}
               <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-red-600 w-full text-left rounded-xl hover:bg-red-50 mt-2">
-                <LogOut size={20} /> ออกจากระบบ
+                <LogOut size={20} /> {t.logout}
               </button>
             </div>
           </div>
