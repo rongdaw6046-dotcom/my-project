@@ -86,8 +86,11 @@ export const ManageMeeting: React.FC = () => {
                             </button>
                             <div>
                                 <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'จัดการการประชุม' : 'สร้างการประชุมใหม่'}</h2>
-                                <p className="text-xs text-gray-500 mt-1">{isEditMode ? 'แก้ไขข้อมูลและตั้งค่าการประชุม' : 'กรอกรายละเอียดเพื่อเริ่มสร้างการประชุม'}</p>
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    {isEditMode ? formData.title : 'กรอกรายละเอียดเพื่อเริ่มสร้างการประชุม'}
+                                </p>
                             </div>
+
                         </div>
 
                         {/* Navigation Tabs (Only in Edit Mode) */}
