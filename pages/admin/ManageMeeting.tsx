@@ -11,6 +11,7 @@ export const ManageMeeting: React.FC = () => {
     const { meetings, addMeeting, updateMeeting } = useApp();
 
     const isEditMode = !!id;
+    const meeting = meetings.find(m => m.id === id);
 
     const [formData, setFormData] = useState<Omit<Meeting, 'id'>>({
         title: '',
@@ -24,22 +25,19 @@ export const ManageMeeting: React.FC = () => {
     });
 
     useEffect(() => {
-        if (isEditMode && id) {
-            const existing = meetings.find(m => m.id === id);
-            if (existing) {
-                setFormData({
-                    title: existing.title,
-                    edition: existing.edition,
-                    date: existing.date,
-                    time: existing.time,
-                    location: existing.location,
-                    status: existing.status,
-                    budget: existing.budget || 0,
-                    minutesFiles: existing.minutesFiles || []
-                });
-            }
+        if (isEditMode && meeting) {
+            setFormData({
+                title: meeting.title,
+                edition: meeting.edition,
+                date: meeting.date,
+                time: meeting.time,
+                location: meeting.location,
+                status: meeting.status,
+                budget: meeting.budget || 0,
+                minutesFiles: meeting.minutesFiles || []
+            });
         }
-    }, [id, isEditMode, meetings]);
+    }, [isEditMode, meeting]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,8 +84,8 @@ export const ManageMeeting: React.FC = () => {
                             </button>
                             <div>
                                 <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'จัดการการประชุม' : 'สร้างการประชุมใหม่'}</h2>
-                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                    {isEditMode ? formData.title : 'กรอกรายละเอียดเพื่อเริ่มสร้างการประชุม'}
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2 min-h-[16px]">
+                                    {isEditMode ? meeting?.title : 'กรอกรายละเอียดเพื่อเริ่มสร้างการประชุม'}
                                 </p>
                             </div>
 
