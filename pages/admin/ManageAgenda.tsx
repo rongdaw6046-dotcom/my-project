@@ -74,8 +74,8 @@ export const ManageAgenda: React.FC = () => {
     };
 
     return (
-        <div className="pb-10 bg-gray-50 min-h-screen">
-            <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto p-6">
+        <div className="pb-10">
+            <div className="flex flex-col lg:flex-row gap-8">
 
                 {/* Left Sidebar */}
                 <div className="w-full lg:w-64 flex-shrink-0">
@@ -114,8 +114,8 @@ export const ManageAgenda: React.FC = () => {
                                     {/* Order Badge */}
                                     <div className="flex flex-col items-center pt-1">
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shadow-sm ${agenda.isImportant
-                                                ? 'bg-red-50 text-red-600 border border-red-100'
-                                                : 'bg-gray-50 text-gray-600 border border-gray-100'
+                                            ? 'bg-red-50 text-red-600 border border-red-100'
+                                            : 'bg-gray-50 text-gray-600 border border-gray-100'
                                             }`}>
                                             {agenda.order}
                                         </div>
@@ -268,8 +268,8 @@ export const ManageAgenda: React.FC = () => {
                                     <div className="flex flex-col justify-end">
                                         <label
                                             className={`flex items-center justify-between px-4 py-2.5 rounded-lg border cursor-pointer transition-all h-[46px] ${editingAgenda?.isImportant
-                                                    ? 'bg-red-50 border-red-200 text-red-700 ring-1 ring-red-200'
-                                                    : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                                                ? 'bg-red-50 border-red-200 text-red-700 ring-1 ring-red-200'
+                                                : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
                                                 }`}
                                         >
                                             <span className="text-sm font-semibold select-none">สำคัญมาก</span>
