@@ -40,10 +40,16 @@ const ResultBar: React.FC<{ label: string; count: number; total: number; color: 
 };
 
 export const UserVoting: React.FC = () => {
-    const { user, meetings, agendas, voteSessions, fetchVoteSessions, castVote, fetchMyVote, fetchVoteResults } = useApp();
+    const { user, meetings, agendas, voteSessions, fetchVoteSessions, castVote, fetchMyVote, fetchVoteResults, attendees } = useApp();
 
     // Meetings user is allowed to join
-    const allowedMeetings = meetings.filter(m => m.status === 'UPCOMING' && (user?.role === 'ADMIN' || user?.allowedMeetingIds?.includes(m.id)));
+    const allowedMeetings = meetings.filter(m => {
+        if (m.status !== 'UPCOMING') return false;
+        if (user?.role === 'ADMIN') return true;
+        const isAttendee = attendees.some(a => a.userId === user?.id && a.meetingId === m.id);
+        const hasPermission = user?.allowedMeetingIds?.includes(m.id);
+        return isAttendee || hasPermission;
+    });
     const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
 
     useEffect(() => {
