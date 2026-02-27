@@ -42,7 +42,12 @@ const ResultBar: React.FC<{ label: string; count: number; total: number; color: 
 export const ManageVoting: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { meetings, agendas, user, voteSessions, fetchVoteSessions, addVoteSession, updateVoteSession, deleteVoteSession, setVoteSessionStatus, fetchVoteResults } = useApp();
+    const {
+        meetings, agendas, user, voteSessions, attendees,
+        fetchVoteSessions, fetchAttendees, sendNotification,
+        addVoteSession, updateVoteSession, deleteVoteSession,
+        setVoteSessionStatus, fetchVoteResults
+    } = useApp();
 
     const meeting = meetings.find(m => m.id === id);
     const meetingAgendas = agendas.filter(a => a.meetingId === id).sort((a, b) => a.order - b.order);
@@ -56,7 +61,10 @@ export const ManageVoting: React.FC = () => {
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
-        if (id) fetchVoteSessions(id);
+        if (id) {
+            fetchVoteSessions(id);
+            fetchAttendees(id);
+        }
     }, [id]);
 
     // Poll results for OPEN sessions every 5 seconds
@@ -125,6 +133,23 @@ export const ManageVoting: React.FC = () => {
     const handleStatusChange = async (sessionId: string, status: VoteSessionStatus) => {
         try {
             await setVoteSessionStatus(sessionId, status);
+
+            if (status === 'OPEN') {
+                const session = meetingSessions.find(s => s.id === sessionId);
+                if (session) {
+                    const validAttendees = attendees.filter(a => a.meetingId === id && a.userId && a.status !== 'DECLINED');
+
+                    Promise.all(validAttendees.map(a =>
+                        sendNotification({
+                            userId: a.userId!,
+                            type: 'MEETING',
+                            title: 'มีวาระการประชุมเปิดให้ลงมติ',
+                            message: `วาระ "${session.title}" ถูกเปิดให้ลงมติแล้ว กรุณาตรวจสอบและลงคะแนน`
+                        })
+                    )).catch(err => console.error('Failed to send voting notifications:', err));
+                }
+            }
+
             if (status !== 'PENDING') {
                 const r = await fetchVoteResults(sessionId);
                 setResults(prev => ({ ...prev, [sessionId]: r }));
