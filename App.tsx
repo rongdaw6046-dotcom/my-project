@@ -15,6 +15,8 @@ import { ManageDocuments } from './pages/admin/ManageDocuments';
 import { ManageMinutes } from './pages/admin/ManageMinutes';
 import { ManageNotifications } from './pages/admin/ManageNotifications';
 import { Reports } from './pages/admin/Reports';
+import { ManageVoting } from './pages/admin/ManageVoting';
+
 import { UserDashboardHome } from './pages/user/UserDashboardHome';
 import { UserDashboard } from './pages/user/UserDashboard';
 import { MeetingDetail } from './pages/user/MeetingDetail';
@@ -23,6 +25,8 @@ import { MeetingHistory } from './pages/user/MeetingHistory';
 import { UserReports } from './pages/user/UserReports';
 import { ActionItems } from './pages/user/ActionItems';
 import { UserSettings } from './pages/user/UserSettings';
+import { UserVoting } from './pages/user/UserVoting';
+
 import { PublicRSVP } from './pages/public/PublicRSVP';
 import { UserRole } from './types';
 
@@ -66,7 +70,9 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin/meetings/:id/attendees" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageAttendees /></ProtectedRoute>} />
       <Route path="/admin/meetings/:id/documents" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageDocuments /></ProtectedRoute>} />
       <Route path="/admin/meetings/:id/minutes" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageMinutes /></ProtectedRoute>} />
+      <Route path="/admin/meetings/:id/voting" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageVoting /></ProtectedRoute>} />
       <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageNotifications /></ProtectedRoute>} />
+
       <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><Reports /></ProtectedRoute>} />
 
       {/* User Routes */}
@@ -76,7 +82,9 @@ const AppRoutes: React.FC = () => {
       <Route path="/user/history" element={<ProtectedRoute allowedRoles={USER_ROLES}><MeetingHistory /></ProtectedRoute>} />
       <Route path="/user/reports" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserReports /></ProtectedRoute>} />
       <Route path="/user/actions" element={<ProtectedRoute allowedRoles={USER_ROLES}><ActionItems /></ProtectedRoute>} />
+      <Route path="/user/voting" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserVoting /></ProtectedRoute>} />
       <Route path="/user/settings" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserSettings /></ProtectedRoute>} />
+
       <Route path="/user/meetings/:id" element={<ProtectedRoute allowedRoles={USER_ROLES}><MeetingDetail /></ProtectedRoute>} />
 
       {/* Fallback */}

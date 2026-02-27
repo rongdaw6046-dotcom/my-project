@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Info, Users, List, FileText, CheckSquare, ChevronRight, BarChart2, Bell } from 'lucide-react';
+import { Info, Users, List, FileText, CheckSquare, ChevronRight, Vote } from 'lucide-react';
 
 interface AdminMeetingTabsProps {
   meetingId: string;
@@ -16,7 +16,9 @@ export const AdminMeetingTabs: React.FC<AdminMeetingTabsProps> = ({ meetingId })
     { path: `/admin/meetings/${meetingId}/attendees`, label: 'ผู้เข้าร่วม', icon: Users },
     { path: `/admin/meetings/${meetingId}/documents`, label: 'เอกสาร', icon: FileText },
     { path: `/admin/meetings/${meetingId}/minutes`, label: 'สรุปการประชุม', icon: CheckSquare },
+    { path: `/admin/meetings/${meetingId}/voting`, label: 'ลงมติ', icon: Vote },
   ];
+
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">

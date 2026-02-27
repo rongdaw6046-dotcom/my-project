@@ -668,6 +668,125 @@ app.post('/api/line/send-invite', async (req, res) => {
   }
 });
 
+// ─── Vote Sessions ────────────────────────────────────────────────────────────
+const formatVoteSession = (row) => ({
+  id: row.id.toString(),
+  meetingId: row.meeting_id.toString(),
+  agendaId: row.agenda_id.toString(),
+  title: row.title || '',
+  status: row.status || 'PENDING',
+  opensAt: row.opens_at || null,
+  closesAt: row.closes_at || null,
+  createdBy: row.created_by ? row.created_by.toString() : null,
+  createdAt: row.created_at || ''
+});
+
+app.get('/api/vote-sessions', async (req, res) => {
+  try {
+    const { meetingId } = req.query;
+    const query = meetingId
+      ? 'SELECT * FROM vote_sessions WHERE meeting_id = $1 ORDER BY created_at ASC'
+      : 'SELECT * FROM vote_sessions ORDER BY created_at ASC';
+    const params = meetingId ? [meetingId] : [];
+    const { rows } = await pool.query(query, params);
+    res.json(rows.map(formatVoteSession));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/vote-sessions', async (req, res) => {
+  try {
+    const { meetingId, agendaId, title, opensAt, closesAt, createdBy } = req.body;
+    const { rows } = await pool.query(
+      'INSERT INTO vote_sessions (meeting_id, agenda_id, title, opens_at, closes_at, created_by) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+      [meetingId, agendaId, title, opensAt || null, closesAt || null, createdBy || null]
+    );
+    res.json(formatVoteSession(rows[0]));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/vote-sessions/:id', async (req, res) => {
+  try {
+    const { agendaId, title, opensAt, closesAt } = req.body;
+    const { rows } = await pool.query(
+      'UPDATE vote_sessions SET agenda_id=$1, title=$2, opens_at=$3, closes_at=$4 WHERE id=$5 RETURNING *',
+      [agendaId, title, opensAt || null, closesAt || null, req.params.id]
+    );
+    res.json(formatVoteSession(rows[0]));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/vote-sessions/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM vote_sessions WHERE id = $1', [req.params.id]);
+    res.status(204).send();
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/vote-sessions/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body; // 'OPEN' | 'CLOSED' | 'PENDING'
+    const now = new Date().toISOString();
+    let query = 'UPDATE vote_sessions SET status=$1';
+    const params = [status];
+    if (status === 'OPEN') { query += ', opens_at=$2 WHERE id=$3 RETURNING *'; params.push(now, req.params.id); }
+    else if (status === 'CLOSED') { query += ', closes_at=$2 WHERE id=$3 RETURNING *'; params.push(now, req.params.id); }
+    else { query += ' WHERE id=$2 RETURNING *'; params.push(req.params.id); }
+    const { rows } = await pool.query(query, params);
+    res.json(formatVoteSession(rows[0]));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/vote-sessions/:id/results', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT choice, COUNT(*) as count FROM votes WHERE session_id = $1 GROUP BY choice`,
+      [req.params.id]
+    );
+    const result = { approve: 0, reject: 0, abstain: 0, total: 0 };
+    rows.forEach(r => {
+      const count = parseInt(r.count);
+      if (r.choice === 'APPROVE') result.approve = count;
+      else if (r.choice === 'REJECT') result.reject = count;
+      else if (r.choice === 'ABSTAIN') result.abstain = count;
+      result.total += count;
+    });
+    res.json(result);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Votes ────────────────────────────────────────────────────────────────────
+app.get('/api/votes', async (req, res) => {
+  try {
+    const { sessionId, userId } = req.query;
+    if (sessionId && userId) {
+      const { rows } = await pool.query('SELECT * FROM votes WHERE session_id=$1 AND user_id=$2', [sessionId, userId]);
+      return res.json(rows[0] ? { id: rows[0].id, sessionId: rows[0].session_id, userId: rows[0].user_id, choice: rows[0].choice, votedAt: rows[0].voted_at } : null);
+    }
+    const { rows } = await pool.query('SELECT * FROM votes WHERE session_id = $1', [sessionId]);
+    res.json(rows.map(r => ({ id: r.id, sessionId: r.session_id, userId: r.user_id, choice: r.choice, votedAt: r.voted_at })));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/votes', async (req, res) => {
+  try {
+    const { sessionId, userId, choice } = req.body;
+    // Check session is OPEN
+    const { rows: sessions } = await pool.query("SELECT status FROM vote_sessions WHERE id = $1", [sessionId]);
+    if (!sessions[0] || sessions[0].status !== 'OPEN') {
+      return res.status(400).json({ error: 'การลงมติไม่ได้เปิดให้ใช้งานอยู่' });
+    }
+    // Upsert vote
+    const { rows } = await pool.query(
+      `INSERT INTO votes (session_id, user_id, choice) VALUES ($1, $2, $3)
+       ON CONFLICT (session_id, user_id) DO UPDATE SET choice = $3, voted_at = NOW()
+       RETURNING *`,
+      [sessionId, userId, choice]
+    );
+    const r = rows[0];
+    res.json({ id: r.id, sessionId: r.session_id, userId: r.user_id, choice: r.choice, votedAt: r.voted_at });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── Seed ─────────────────────────────────────────────────────────────────────
 app.get('/api/seed', async (req, res) => {
   try {

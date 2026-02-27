@@ -72,6 +72,37 @@ export interface Notification {
   createdAt: string;
 }
 
+// ─── Voting / Resolution System ───────────────────────────────────────────────
+export type VoteChoice = 'APPROVE' | 'REJECT' | 'ABSTAIN';
+export type VoteSessionStatus = 'PENDING' | 'OPEN' | 'CLOSED';
+
+export interface VoteSession {
+  id: string;
+  meetingId: string;
+  agendaId: string;
+  title: string;
+  status: VoteSessionStatus;
+  opensAt?: string;
+  closesAt?: string;
+  createdBy?: string;
+  createdAt: string;
+}
+
+export interface Vote {
+  id: string;
+  sessionId: string;
+  userId: string;
+  choice: VoteChoice;
+  votedAt: string;
+}
+
+export interface VoteResult {
+  approve: number;
+  reject: number;
+  abstain: number;
+  total: number;
+}
+
 export interface MeetingContextType {
   user: User | null;
   users: User[];
@@ -113,4 +144,14 @@ export interface MeetingContextType {
   fetchNotifications: () => void;
   sendNotification: (notif: Omit<Notification, 'id' | 'isRead' | 'createdAt'>) => void;
   markAsRead: (id: string) => void;
+  // Voting Actions
+  voteSessions: VoteSession[];
+  fetchVoteSessions: (meetingId: string) => Promise<void>;
+  addVoteSession: (session: Omit<VoteSession, 'id' | 'createdAt'>) => Promise<VoteSession>;
+  updateVoteSession: (id: string, data: Partial<VoteSession>) => Promise<void>;
+  deleteVoteSession: (id: string) => Promise<void>;
+  setVoteSessionStatus: (id: string, status: VoteSessionStatus) => Promise<void>;
+  fetchVoteResults: (sessionId: string) => Promise<VoteResult>;
+  castVote: (sessionId: string, userId: string, choice: VoteChoice) => Promise<void>;
+  fetchMyVote: (sessionId: string, userId: string) => Promise<Vote | null>;
 }

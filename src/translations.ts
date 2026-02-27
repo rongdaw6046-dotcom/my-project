@@ -45,6 +45,8 @@ export const translations = {
         // Role
         admin: 'ผู้ดูแลระบบ',
         user: 'ผู้ใช้งานทั่วไป',
+        voting: 'ลงมติวาระ',
+        manageVoting: 'จัดการลงมติ',
     },
     en: {
         // Navigation
@@ -91,7 +93,10 @@ export const translations = {
         // Role
         admin: 'Administrator',
         user: 'General User',
+        voting: 'Meeting Voting',
+        manageVoting: 'Manage Voting',
     }
+
 };
 
 export type TranslationKeys = keyof typeof translations.th;

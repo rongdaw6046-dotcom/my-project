@@ -5,8 +5,9 @@ import { translations } from '../src/translations';
 import {
   Bell, LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
   Users, Menu as MenuIcon, PlusCircle, History, BookOpen,
-  CheckSquare, Settings, Home, X, BarChart2
+  CheckSquare, Settings, Home, X, BarChart2, Vote
 } from 'lucide-react';
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NotificationCenter } from './NotificationCenter';
 
@@ -66,6 +67,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       <SectionLabel label={t.tasks} />
       <NavItem to="/user/actions" icon={CheckSquare} label={t.assignedTasks} />
+      <NavItem to="/user/voting" icon={Vote} label={t.voting} />
 
       <SectionLabel label={t.account} />
       <NavItem to="/user/settings" icon={Settings} label={t.accountSettings} />

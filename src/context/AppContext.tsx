@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   User, Meeting, AgendaItem, Attendee, MeetingDocument, Notification,
-  MeetingContextType, UserRole, AttendeeStatus
+  MeetingContextType, UserRole, AttendeeStatus,
+  VoteSession, VoteSessionStatus, VoteResult, Vote, VoteChoice
 } from '../../types';
 
 const AppContext = createContext<MeetingContextType | undefined>(undefined);
@@ -42,17 +43,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('user_prefs', JSON.stringify({ ...prefs, darkMode: dark }));
   };
 
-  // Apply dark mode class on <html> element
   useEffect(() => {
     const html = document.documentElement;
-    if (darkMode) {
-      html.classList.add('dark');
-    } else {
-      html.classList.remove('dark');
-    }
+    if (darkMode) html.classList.add('dark');
+    else html.classList.remove('dark');
   }, [darkMode]);
 
-  // Apply lang attribute on <html> element
   useEffect(() => {
     document.documentElement.setAttribute('lang', lang);
   }, [lang]);
@@ -136,15 +132,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         alert(`ไม่สามารถบันทึกข้อมูลได้: ${err.error}`);
         return;
       }
-
       const updatedData = await res.json();
-
-      // Synchronize current user state if updated
       if (user && id.toString() === user.id.toString()) {
         setUser(updatedData);
         localStorage.setItem('kku_user', JSON.stringify(updatedData));
       }
-
       await fetchData();
       alert('บันทึกข้อมูลเรียบร้อยแล้ว');
     } catch (err: any) {
@@ -173,10 +165,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(meeting)
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to add meeting');
-    }
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to add meeting'); }
     await fetchData();
   };
 
@@ -186,10 +175,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedMeeting)
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to update meeting');
-    }
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update meeting'); }
     await fetchData();
   };
 
@@ -236,24 +222,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addAttendee = async (attendee: any) => {
     const mId = attendee.meetingId || attendee.meeting_id;
     const uId = attendee.userId || attendee.user_id;
-
     if (uId) {
       const exists = attendees.find(a => a.userId === uId && a.meetingId === mId);
       if (exists) { alert('รายชื่อนี้มีอยู่ในระบบแล้ว'); return; }
     }
-
     const res = await fetch(`${API}/attendees`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ meetingId: mId, userId: uId, name: attendee.name, position: attendee.position })
     });
-
-    if (!res.ok) {
-      const err = await res.json();
-      alert('บันทึกไม่สำเร็จ: ' + err.error);
-    } else {
-      if (mId) fetchAttendees(mId);
-    }
+    if (!res.ok) { const err = await res.json(); alert('บันทึกไม่สำเร็จ: ' + err.error); }
+    else if (mId) fetchAttendees(mId);
   };
 
   const removeAttendee = async (id: string) => {
@@ -282,7 +261,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addDocument = async (doc: any) => {
-    // doc can contain { meetingId, name, url, fileData, mimeType }
     await fetch(`${API}/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -301,7 +279,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notifications, setNotifications] = useState<any[]>([]);
   const fetchNotifications = async () => {
     try {
-      const userId = user?.id; // Assuming user is available in scope or passed
+      const userId = user?.id;
       const url = userId ? `${API}/notifications?userId=${userId}` : `${API}/notifications`;
       const data = await fetch(url).then(r => r.json());
       if (Array.isArray(data)) setNotifications(data);
@@ -322,6 +300,77 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fetchNotifications();
   };
 
+  // --- 9. Voting ---
+  const [voteSessions, setVoteSessions] = useState<VoteSession[]>([]);
+
+  const fetchVoteSessions = async (meetingId: string): Promise<void> => {
+    try {
+      const data = await fetch(`${API}/vote-sessions?meetingId=${meetingId}`).then(r => r.json());
+      if (Array.isArray(data)) setVoteSessions(data);
+    } catch (e) { console.error('Error fetching vote sessions:', e); }
+  };
+
+  const addVoteSession = async (session: Omit<VoteSession, 'id' | 'createdAt'>): Promise<VoteSession> => {
+    const res = await fetch(`${API}/vote-sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(session)
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to add vote session'); }
+    const newSession = await res.json();
+    await fetchVoteSessions(session.meetingId);
+    return newSession;
+  };
+
+  const updateVoteSession = async (id: string, data: Partial<VoteSession>): Promise<void> => {
+    const res = await fetch(`${API}/vote-sessions/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update vote session'); }
+    const session = await res.json() as VoteSession;
+    await fetchVoteSessions(session.meetingId);
+  };
+
+  const deleteVoteSession = async (id: string): Promise<void> => {
+    const session = voteSessions.find(s => s.id === id);
+    await fetch(`${API}/vote-sessions/${id}`, { method: 'DELETE' });
+    if (session) await fetchVoteSessions(session.meetingId);
+  };
+
+  const setVoteSessionStatus = async (id: string, status: VoteSessionStatus): Promise<void> => {
+    const res = await fetch(`${API}/vote-sessions/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update status'); }
+    const updated = await res.json() as VoteSession;
+    await fetchVoteSessions(updated.meetingId);
+  };
+
+  const fetchVoteResults = async (sessionId: string): Promise<VoteResult> => {
+    const res = await fetch(`${API}/vote-sessions/${sessionId}/results`);
+    if (!res.ok) throw new Error('Failed to fetch results');
+    return res.json();
+  };
+
+  const castVote = async (sessionId: string, userId: string, choice: VoteChoice): Promise<void> => {
+    const res = await fetch(`${API}/votes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, userId, choice })
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to cast vote'); }
+  };
+
+  const fetchMyVote = async (sessionId: string, userId: string): Promise<Vote | null> => {
+    const res = await fetch(`${API}/votes?sessionId=${sessionId}&userId=${userId}`);
+    if (!res.ok) return null;
+    return res.json();
+  };
+
   return (
     <AppContext.Provider value={{
       user, users, meetings, agendas, attendees, isLoading,
@@ -334,7 +383,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       fetchAttendees,
       documents, notifications,
       fetchDocuments, addDocument, deleteDocument,
-      fetchNotifications, sendNotification, markAsRead
+      fetchNotifications, sendNotification, markAsRead,
+      // Voting
+      voteSessions,
+      fetchVoteSessions, addVoteSession, updateVoteSession, deleteVoteSession,
+      setVoteSessionStatus, fetchVoteResults, castVote, fetchMyVote,
     }}>
       {children}
     </AppContext.Provider>
