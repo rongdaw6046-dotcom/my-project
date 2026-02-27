@@ -163,8 +163,8 @@ export const ManageVoting: React.FC = () => {
     };
 
     return (
-        <div className="pb-10 bg-gray-50 min-h-screen">
-            <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto p-6">
+        <div className="pb-10">
+            <div className="flex flex-col lg:flex-row gap-8">
                 {/* Left Sidebar */}
                 <div className="w-full lg:w-64 flex-shrink-0">
                     <div className="sticky top-6 space-y-6">

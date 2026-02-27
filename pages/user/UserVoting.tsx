@@ -44,7 +44,7 @@ export const UserVoting: React.FC = () => {
 
     // Meetings user is allowed to join
     const allowedMeetings = meetings.filter(m => {
-        if (m.status !== 'UPCOMING') return false;
+        if (m.status === 'DRAFT' || m.status === 'CANCELLED') return false;
         if (user?.role === 'ADMIN') return true;
         const isAttendee = attendees.some(a => a.userId === user?.id && a.meetingId === m.id);
         const hasPermission = user?.allowedMeetingIds?.includes(m.id);
