@@ -57,6 +57,22 @@ const migrate = async () => {
       console.log('ℹ️ Column minutes_summary already exists in meetings');
     }
 
+    // 3.5. Alter Notifications table to add link
+    const { rows: notifColumns } = await client.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name='notifications' AND column_name='link';
+    `);
+
+    if (notifColumns.length === 0) {
+      await client.query(`
+        ALTER TABLE notifications ADD COLUMN link TEXT;
+      `);
+      console.log('✅ Added column: link to notifications');
+    } else {
+      console.log('ℹ️ Column link already exists in notifications');
+    }
+
     // 4. Alter Documents table to add file_data and mime_type
     const { rows: docColumns } = await client.query(`
       SELECT column_name 

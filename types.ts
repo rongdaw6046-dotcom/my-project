@@ -67,6 +67,7 @@ export interface Notification {
   userId?: string;
   title: string;
   message: string;
+  link?: string;
   type: string;
   isRead: boolean;
   createdAt: string;

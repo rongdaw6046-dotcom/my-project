@@ -361,6 +361,7 @@ app.get('/api/notifications', async (req, res) => {
       userId: row.user_id,
       title: row.title,
       message: row.message,
+      link: row.link,
       type: row.type,
       isRead: row.is_read,
       createdAt: row.created_at
@@ -370,12 +371,12 @@ app.get('/api/notifications', async (req, res) => {
 
 app.post('/api/notifications', async (req, res) => {
   try {
-    const { userId, title, message, type } = req.body;
+    const { userId, title, message, link, type } = req.body;
 
     // 1. Save to Database
     const { rows: newNotif } = await pool.query(
-      'INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, $4) RETURNING *',
-      [userId || null, title, message, type || 'SYSTEM']
+      'INSERT INTO notifications (user_id, title, message, link, type) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [userId || null, title, message, link || null, type || 'SYSTEM']
     );
 
     const row = newNotif[0];
@@ -384,6 +385,7 @@ app.post('/api/notifications', async (req, res) => {
       userId: row.user_id,
       title: row.title,
       message: row.message,
+      link: row.link,
       type: row.type,
       isRead: row.is_read,
       createdAt: row.created_at

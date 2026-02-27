@@ -144,7 +144,8 @@ export const ManageVoting: React.FC = () => {
                             userId: a.userId!,
                             type: 'MEETING',
                             title: 'มีวาระการประชุมเปิดให้ลงมติ',
-                            message: `วาระ "${session.title}" ถูกเปิดให้ลงมติแล้ว กรุณาตรวจสอบและลงคะแนน`
+                            message: `วาระ "${session.title}" ถูกเปิดให้ลงมติแล้ว กรุณาตรวจสอบและลงคะแนน`,
+                            link: '/user/voting'
                         })
                     )).catch(err => console.error('Failed to send voting notifications:', err));
                 }

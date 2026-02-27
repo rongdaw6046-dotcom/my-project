@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../src/context/AppContext';
 import { Bell, Info, AlertTriangle, CheckCircle, X, Clock } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface NotificationCenterProps {
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose }) => {
     const { notifications, fetchNotifications, markAsRead, lang } = useApp();
+    const navigate = useNavigate();
 
     const getIcon = (type: string) => {
         switch (type.toUpperCase()) {
@@ -35,7 +37,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose 
                 {notifications.map(n => (
                     <div
                         key={n.id}
-                        onClick={() => !n.isRead && markAsRead(n.id)}
+                        onClick={() => {
+                            if (!n.isRead) markAsRead(n.id);
+                            if (n.link) {
+                                navigate(n.link);
+                                if (onClose) onClose();
+                            }
+                        }}
                         className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${!n.isRead ? 'bg-orange-50/30 dark:bg-orange-900/10' : ''}`}
                     >
                         <div className="flex gap-3">
