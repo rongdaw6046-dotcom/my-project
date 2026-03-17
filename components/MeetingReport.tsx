@@ -80,7 +80,7 @@ export const MeetingReport: React.FC<MeetingReportProps> = ({ meeting, attendees
             </div>
 
             <div className="print-footer fixed bottom-4 w-full text-center text-xs text-gray-400">
-                จากระบบบริหารจัดการการประชุมโรงพยาบาลศรีเทพ เมื่อ {new Date().toLocaleDateString('th-TH')}
+                จากระบบจัดการการประชุมโรงพยาบาลศรีเทพ เมื่อ {new Date().toLocaleDateString('th-TH')}
             </div>
         </div>
     );

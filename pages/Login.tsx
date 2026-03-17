@@ -53,23 +53,24 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl flex overflow-hidden min-h-[500px]">
+    <div className="min-h-screen flex items-center justify-center bg-[url('/hospital-bg.jpg')] bg-cover bg-center bg-fixed bg-no-repeat p-4">
+      {/* Overlay to ensure the form is readable against the background */}
+      <div className="absolute inset-0 bg-[#FDF5E6]/60 backdrop-blur-sm z-0"></div>
+      
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl flex overflow-hidden min-h-[500px] relative z-10 border border-white/20">
 
         {/* Left Side - Image/Brand */}
-        <div className="hidden md:flex w-1/2 bg-orange-600 p-12 flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-20"></div>
+        <div className="hidden md:flex w-1/2 bg-[#5A382A] bg-[url('/hospital-bg.jpg')] bg-cover bg-center p-12 flex-col justify-between relative overflow-hidden group">
+          <div className="absolute inset-0 bg-[#5A382A]/85 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#4A281A]/80 via-transparent to-[#2A1810]/95"></div>
           <div className="relative z-10">
-            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain bg-white/20 backdrop-blur-sm rounded-xl mb-6 p-1" />
-            <h2 className="text-3xl font-bold text-white mb-2">MeetingSrithep</h2>
-            <p className="text-orange-100">ระบบบริหารจัดการการประชุม<br />โรงพยาบาลศรีเทพ</p>
+            <img src="/logo.png" alt="Logo" className="w-14 h-14 object-contain bg-white/90 backdrop-blur-sm rounded-xl mb-6 p-1.5 shadow-lg" />
+            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">MeetingSrithep</h2>
+            <p className="text-orange-50 font-medium drop-shadow whitespace-nowrap">ระบบจัดการการประชุม โรงพยาบาลศรีเทพ</p>
           </div>
-          <div className="relative z-10 text-orange-100 text-sm">
+          <div className="relative z-10 text-orange-200 text-sm font-medium drop-shadow mt-auto">
             © Computer Center
           </div>
-          {/* Decorative circles */}
-          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-orange-500 rounded-full opacity-50"></div>
-          <div className="absolute -top-24 -left-24 w-64 h-64 bg-orange-500 rounded-full opacity-50"></div>
         </div>
 
         {/* Right Side - Form */}
@@ -83,14 +84,14 @@ export const Login: React.FC = () => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">ชื่อผู้ใช้งาน</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-orange-600 transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                   <User size={20} />
                 </div>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                   placeholder="Username"
                 />
               </div>
@@ -99,14 +100,14 @@ export const Login: React.FC = () => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">รหัสผ่าน</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-orange-600 transition-colors">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                   <Lock size={20} />
                 </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>
@@ -117,7 +118,7 @@ export const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isLoggingIn}
-              className={`w-full flex items-center justify-center gap-2 py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-0.5 ${isLoggingIn ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#EB5B00] hover:bg-[#D45200] text-white font-semibold rounded-xl shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-0.5 ${isLoggingIn ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {isLoggingIn ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'} {!isLoggingIn && <ArrowRight size={20} />}
             </button>
@@ -125,7 +126,7 @@ export const Login: React.FC = () => {
 
           <div className="mt-8 text-center space-y-4">
             <p className="text-sm text-gray-500">
-              ยังไม่มีบัญชีผู้ใช้งาน? <Link to="/register" className="text-orange-600 font-bold hover:underline">สมัครสมาชิก</Link>
+              ยังไม่มีบัญชีผู้ใช้งาน? <Link to="/register" className="text-[#EB5B00] font-bold hover:underline">สมัครสมาชิก</Link>
             </p>
             <div className="border-t border-gray-100 pt-4">
               <p className="text-xs text-gray-400">ทดสอบระบบ (หลังจาก Seed DB): admin / password</p>

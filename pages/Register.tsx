@@ -52,32 +52,36 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl flex overflow-hidden min-h-[600px]">
+    <div className="min-h-screen flex items-center justify-center bg-[url('/hospital-bg.jpg')] bg-cover bg-center bg-fixed bg-no-repeat p-4">
+      {/* Overlay to ensure the form is readable against the background */}
+      <div className="absolute inset-0 bg-[#FDF5E6]/60 backdrop-blur-sm z-0"></div>
+      
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl flex overflow-hidden min-h-[600px] relative z-10 border border-white/20">
 
         {/* Left Side - Image/Brand (Same as Login) */}
-        <div className="hidden md:flex w-5/12 bg-orange-600 p-12 flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-20"></div>
+        <div className="hidden md:flex w-5/12 bg-[#5A382A] bg-[url('/hospital-bg.jpg')] bg-cover bg-center p-12 flex-col justify-between relative overflow-hidden group">
+          <div className="absolute inset-0 bg-[#5A382A]/85 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#4A281A]/80 via-transparent to-[#2A1810]/95"></div>
           <div className="relative z-10">
-            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain bg-white/20 backdrop-blur-sm rounded-xl mb-6 p-1" />
-            <h2 className="text-3xl font-bold text-white mb-2">MeetingSrithep</h2>
-            <p className="text-orange-100">ระบบบริหารจัดการการประชุม<br />โรงพยาบาลศรีเทพ</p>
+            <img src="/logo.png" alt="Logo" className="w-14 h-14 object-contain bg-white/90 backdrop-blur-sm rounded-xl mb-6 p-1.5 shadow-lg" />
+            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">MeetingSrithep</h2>
+            <p className="text-orange-50 font-medium drop-shadow whitespace-nowrap">ระบบจัดการการประชุม โรงพยาบาลศรีเทพ</p>
           </div>
 
-          <div className="relative z-10">
-            <p className="text-white font-medium mb-4">เข้าร่วมกับเราวันนี้</p>
-            <ul className="text-orange-100 text-sm space-y-2">
-              <li className="flex items-center gap-2">✓ จัดการวาระการประชุมได้ง่าย</li>
-              <li className="flex items-center gap-2">✓ ติดตามสถานะผู้เข้าร่วม</li>
-              <li className="flex items-center gap-2">✓ เข้าถึงเอกสารการประชุมออนไลน์</li>
-            </ul>
+          <div className="relative z-10 pt-8 mt-auto mb-12">
+            <div className="bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
+              <p className="text-white font-semibold mb-4 text-lg">เข้าร่วมกับเราวันนี้</p>
+              <ul className="text-orange-50 text-sm space-y-3">
+                <li className="flex items-center gap-3"><span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-[10px]">✓</span> จัดการวาระการประชุมได้ง่าย</li>
+                <li className="flex items-center gap-3"><span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-[10px]">✓</span> ติดตามสถานะผู้เข้าร่วม</li>
+                <li className="flex items-center gap-3"><span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-[10px]">✓</span> เข้าถึงเอกสารการประชุมออนไลน์</li>
+              </ul>
+            </div>
           </div>
 
-          <div className="relative z-10 text-orange-100 text-sm mt-8">
+          <div className="relative z-10 text-orange-200 text-sm font-medium drop-shadow mt-auto">
             © Computer Center
           </div>
-          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-orange-500 rounded-full opacity-50"></div>
-          <div className="absolute -top-24 -left-24 w-64 h-64 bg-orange-500 rounded-full opacity-50"></div>
         </div>
 
         {/* Right Side - Register Form */}
@@ -92,7 +96,7 @@ export const Register: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">ชื่อจริง</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                     <UserCircle size={20} />
                   </div>
                   <input
@@ -100,7 +104,7 @@ export const Register: React.FC = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                     placeholder="ชื่อจริง"
                     required
                   />
@@ -114,7 +118,7 @@ export const Register: React.FC = () => {
                     name="surname"
                     value={formData.surname}
                     onChange={handleChange}
-                    className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                     placeholder="นามสกุล"
                     required
                   />
@@ -125,7 +129,7 @@ export const Register: React.FC = () => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">ตำแหน่ง / สังกัด</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                   <Briefcase size={20} />
                 </div>
                 <input
@@ -133,7 +137,7 @@ export const Register: React.FC = () => {
                   name="position"
                   value={formData.position}
                   onChange={handleChange}
-                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                   placeholder="เช่น อาจารย์, นักวิชาการศึกษา"
                 />
               </div>
@@ -144,7 +148,7 @@ export const Register: React.FC = () => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">ชื่อผู้ใช้งาน (Username)</label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                   <User size={20} />
                 </div>
                 <input
@@ -152,7 +156,7 @@ export const Register: React.FC = () => {
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                   placeholder="ภาษาอังกฤษเท่านั้น"
                   required
                 />
@@ -163,7 +167,7 @@ export const Register: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">รหัสผ่าน</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                     <Lock size={20} />
                   </div>
                   <input
@@ -171,7 +175,7 @@ export const Register: React.FC = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                     placeholder="••••••••"
                     required
                   />
@@ -180,7 +184,7 @@ export const Register: React.FC = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">ยืนยันรหัสผ่าน</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#EB5B00] transition-colors">
                     <Lock size={20} />
                   </div>
                   <input
@@ -188,7 +192,7 @@ export const Register: React.FC = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                    className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#EB5B00] focus:border-transparent transition-all outline-none"
                     placeholder="••••••••"
                     required
                   />
@@ -200,7 +204,7 @@ export const Register: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-0.5 mt-2"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#EB5B00] hover:bg-[#D45200] text-white font-semibold rounded-xl shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-0.5 mt-2"
             >
               สมัครสมาชิก <ArrowRight size={20} />
             </button>
@@ -208,7 +212,7 @@ export const Register: React.FC = () => {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
-              มีบัญชีผู้ใช้งานแล้ว? <Link to="/" className="text-orange-600 font-bold hover:underline">เข้าสู่ระบบ</Link>
+              มีบัญชีผู้ใช้งานแล้ว? <Link to="/" className="text-[#EB5B00] font-bold hover:underline">เข้าสู่ระบบ</Link>
             </p>
           </div>
         </div>

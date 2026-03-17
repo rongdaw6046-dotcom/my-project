@@ -100,7 +100,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="font-bold text-gray-800 text-lg leading-tight">Meeting Srithep</h1>
-              <p className="text-xs text-gray-400">ระบบบริหารจัดการการประชุม</p>
+              <p className="text-xs text-gray-400">ระบบจัดการการประชุม</p>
             </div>
           </div>
           <button

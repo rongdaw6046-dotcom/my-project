@@ -1,3 +1,6 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useApp } from '../../src/context/AppContext';
 import { ArrowLeft, Users, Calendar, FileText, CheckCircle, Clock, XCircle, BarChart2, PieChart, Printer, Download, Eye, X } from 'lucide-react';
 
 export const Reports: React.FC = () => {

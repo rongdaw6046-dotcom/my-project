@@ -211,7 +211,7 @@ export const ManageAttendees: React.FC = () => {
                                     <button
                                         onClick={() => {
                                             const rsvpLink = `${window.location.origin}/#/rsvp/${meeting.id}`;
-                                            const message = `📌 [เชิญเข้าร่วมประชุม]\n━━━━━━━━━━━━━━\n📝 หัวข้อ: ${meeting.title}\n📅 วันที่: ${meeting.date}\n⏰ เวลา: ${meeting.time}\n📍 สถานที่: ${meeting.location}\n━━━━━━━━━━━━━━\n\n✅ กรุณาตอบรับได้ที่:\n${rsvpLink}\n\n[ระบบบริหารจัดการการประชุมโรงพยาบาลศรีเทพ]`;
+                                            const message = `📌 [เชิญเข้าร่วมประชุม]\n━━━━━━━━━━━━━━\n📝 หัวข้อ: ${meeting.title}\n📅 วันที่: ${meeting.date}\n⏰ เวลา: ${meeting.time}\n📍 สถานที่: ${meeting.location}\n━━━━━━━━━━━━━━\n\n✅ กรุณาตอบรับได้ที่:\n${rsvpLink}\n\n[ระบบจัดการการประชุมโรงพยาบาลศรีเทพ]`;
                                             window.open(`https://line.me/R/msg/text/?${encodeURIComponent(message)}`, '_blank');
                                         }}
                                         className="whitespace-nowrap flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg shadow-sm transition-all text-sm font-medium"
