@@ -62,7 +62,7 @@ export const UserVoting: React.FC = () => {
         if (selectedMeetingId) fetchVoteSessions(selectedMeetingId);
     }, [selectedMeetingId]);
 
-    const currentSessions = voteSessions.filter(s => s.meetingId === selectedMeetingId && (s.status === 'OPEN' || s.status === 'CLOSED'));
+    const currentSessions = voteSessions.filter(s => s.meetingId === selectedMeetingId && s.status === 'OPEN');
 
     // Per-session vote state
     const [voteStates, setVoteStates] = useState<Record<string, VoteState>>({});
