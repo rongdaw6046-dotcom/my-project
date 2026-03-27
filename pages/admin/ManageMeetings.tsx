@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { Link } from 'react-router-dom';
 import { Search, Edit, List, Trash, FileText, Calendar, Clock, MapPin, Users, FileDown, CheckCircle } from 'lucide-react';
+import { MeetingScheduleTable } from '../../components/MeetingScheduleTable';
 
 export const ManageMeetings: React.FC = () => {
-  const { meetings, deleteMeeting } = useApp();
+  const { meetings, deleteMeeting, attendees, users, user } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'ALL' | 'UPCOMING' | 'COMPLETED'>('ALL');
 
@@ -73,6 +74,16 @@ export const ManageMeetings: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Meeting Schedule Table */}
+      {user && (
+        <MeetingScheduleTable
+          meetings={filteredMeetings}
+          attendees={attendees}
+          users={users}
+          currentUser={user}
+        />
+      )}
 
       {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

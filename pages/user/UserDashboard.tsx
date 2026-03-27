@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useApp } from '../../src/context/AppContext';
 import { Link } from 'react-router-dom';
 import { Search, Calendar, MapPin, ChevronRight, Clock } from 'lucide-react';
+import { MeetingScheduleTable } from '../../components/MeetingScheduleTable';
 
 export const UserDashboard: React.FC = () => {
-  const { meetings, user, attendees } = useApp();
+  const { meetings, user, attendees, users } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!user) return null;
@@ -22,6 +23,15 @@ export const UserDashboard: React.FC = () => {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">การประชุมของฉัน</h2>
 
+      {/* Meeting Schedule Table */}
+      <MeetingScheduleTable
+        meetings={myMeetings}
+        attendees={attendees}
+        users={users}
+        currentUser={user}
+      />
+
+      {/* Search */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
           <Search size={18} />
