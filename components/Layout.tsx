@@ -5,7 +5,7 @@ import { translations } from '../src/translations';
 import {
   Bell, LogOut, LayoutDashboard, User as UserIcon, Calendar, CalendarDays,
   Users, Menu as MenuIcon, PlusCircle, History, BookOpen,
-  CheckSquare, Settings, Home, X, BarChart2, Vote
+  CheckSquare, Settings, Home, X, BarChart2, Vote, TableProperties
 } from 'lucide-react';
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -60,6 +60,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <NavItem to="/user/home" icon={Home} label={t.home} />
 
       <SectionLabel label={t.meetings} />
+      <NavItem to="/user/schedule" icon={TableProperties} label={t.meetingSchedule} />
       <NavItem to="/user/dashboard" icon={Calendar} label={t.myMeetings} />
       <NavItem to="/user/calendar" icon={CalendarDays} label={t.calendar} />
       <NavItem to="/user/history" icon={History} label={t.history} />
@@ -83,6 +84,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <NavItem to="/admin/reports" icon={BarChart2} label={t.adminReports} />
 
       <SectionLabel label={t.meetings} />
+      <NavItem to="/admin/schedule" icon={TableProperties} label={t.meetingSchedule} />
       <NavItem to="/admin/meetings" icon={Calendar} label={t.manageMeetings} />
       <NavItem to="/admin/meetings/new" icon={PlusCircle} label={t.createMeeting} />
 

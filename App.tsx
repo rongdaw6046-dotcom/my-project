@@ -16,6 +16,7 @@ import { ManageMinutes } from './pages/admin/ManageMinutes';
 import { ManageNotifications } from './pages/admin/ManageNotifications';
 import { Reports } from './pages/admin/Reports';
 import { ManageVoting } from './pages/admin/ManageVoting';
+import { AdminMeetingSchedule } from './pages/admin/AdminMeetingSchedule';
 
 import { UserDashboardHome } from './pages/user/UserDashboardHome';
 import { UserDashboard } from './pages/user/UserDashboard';
@@ -26,6 +27,7 @@ import { UserReports } from './pages/user/UserReports';
 import { ActionItems } from './pages/user/ActionItems';
 import { UserSettings } from './pages/user/UserSettings';
 import { UserVoting } from './pages/user/UserVoting';
+import { UserMeetingSchedule } from './pages/user/UserMeetingSchedule';
 
 import { PublicRSVP } from './pages/public/PublicRSVP';
 import { UserRole } from './types';
@@ -64,6 +66,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageUsers /></ProtectedRoute>} />
       <Route path="/admin/meetings" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageMeetings /></ProtectedRoute>} />
+      <Route path="/admin/schedule" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminMeetingSchedule /></ProtectedRoute>} />
       <Route path="/admin/meetings/new" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageMeeting /></ProtectedRoute>} />
       <Route path="/admin/meetings/edit/:id" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageMeeting /></ProtectedRoute>} />
       <Route path="/admin/meetings/:id/agenda" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageAgenda /></ProtectedRoute>} />
@@ -78,6 +81,7 @@ const AppRoutes: React.FC = () => {
       {/* User Routes */}
       <Route path="/user/home" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserDashboardHome /></ProtectedRoute>} />
       <Route path="/user/dashboard" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserDashboard /></ProtectedRoute>} />
+      <Route path="/user/schedule" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserMeetingSchedule /></ProtectedRoute>} />
       <Route path="/user/calendar" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserCalendar /></ProtectedRoute>} />
       <Route path="/user/history" element={<ProtectedRoute allowedRoles={USER_ROLES}><MeetingHistory /></ProtectedRoute>} />
       <Route path="/user/reports" element={<ProtectedRoute allowedRoles={USER_ROLES}><UserReports /></ProtectedRoute>} />
